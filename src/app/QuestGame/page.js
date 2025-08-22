@@ -1,119 +1,90 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Phaser from 'phaser';
-import { GameScene } from '../../../components/Quest/scenes/GameScene.js';
+import dynamic from 'next/dynamic';
+import { QUESTIONS } from './questions.js';
 
-// Questions JSON data embedded in the page
-const QUESTIONS = [
-  {
-    "question": "Which of the following is a feature of Core Java?",
-    "answers": ["Platform Dependent", "Object-Oriented", "No Memory Management"],
-    "correctAnswer": "Object-Oriented"
-  },
-  {
-    "question": "Which keyword is used to inherit a class in Java?",
-    "answers": ["this", "super", "extends"],
-    "correctAnswer": "extends"
-  },
-  {
-    "question": "What is the SI unit of force?",
-    "answers": ["Newton", "Joule", "Watt"],
-    "correctAnswer": "Newton"
-  },
-  {
-    "question": "Which process do green plants use to make food using sunlight?",
-    "answers": ["Photosynthesis", "Respiration", "Transpiration"],
-    "correctAnswer": "Photosynthesis"
-  },
-  {
-    "question": "What is the pH value of pure neutral water at 25°C?",
-    "answers": ["7", "0", "14"],
-    "correctAnswer": "7"
-  },
-  {
-    "question": "Which formula gives the area of a circle?",
-    "answers": ["πr^2", "2πr", "πd"],
-    "correctAnswer": "πr^2"
-  },
-  {
-    "question": "What does CPU stand for in computer science?",
-    "answers": ["Central Processing Unit", "Central Program Unit", "Control Processing Unit"],
-    "correctAnswer": "Central Processing Unit"
-  },
-  {
-    "question": "Which is the largest ocean on Earth?",
-    "answers": ["Indian Ocean", "Atlantic Ocean", "Pacific Ocean"],
-    "correctAnswer": "Pacific Ocean"
-  },
-  {
-    "question": "Who led the Salt March in India in 1930?",
-    "answers": ["Jawaharlal Nehru", "Subhas Chandra Bose", "Mahatma Gandhi"],
-    "correctAnswer": "Mahatma Gandhi"
-  },
-  {
-    "question": "Which of the following words is a pronoun?",
-    "answers": ["They", "Run", "Beautiful"],
-    "correctAnswer": "They"
-  }
-];
+// Dynamically import Phaser to prevent SSR issues
+const Phaser = dynamic(() => import('phaser'), { ssr: false });
 
 export default function QuestGamePage() {
   const gameRef = useRef(null);
   const phaserGameRef = useRef(null);
   const [gameLoaded, setGameLoaded] = useState(false);
   const [error, setError] = useState(null);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     // Only run on client side
-    if (typeof window === 'undefined') return;
+    if (!isClient || typeof window === 'undefined') return;
 
     // Prevent multiple game instances
     if (phaserGameRef.current) return;
 
-    try {
-      // Phaser game configuration
-      const config = {
-        type: Phaser.AUTO,
-        width: 800,
-        height: 600,
-        parent: gameRef.current,
-        backgroundColor: '#87CEEB',
-        physics: {
-          default: 'arcade',
-          arcade: {
-            gravity: { y: 0 }, // We'll handle gravity manually
-            debug: false
-          }
-        },
-        scene: GameScene,
-        scale: {
-          mode: Phaser.Scale.FIT,
-          autoCenter: Phaser.Scale.CENTER_BOTH,
-          min: {
-            width: 400,
-            height: 300
+    const initGame = async () => {
+      try {
+        // Dynamic import of GameScene to avoid SSR issues
+        const { GameScene } = await import('../../../components/Quest/scenes/GameScene.js');
+        const PhaserModule = await import('phaser');
+        
+        // Phaser game configuration
+        const config = {
+          type: PhaserModule.default.AUTO,
+          width: 800,
+          height: 600,
+          parent: gameRef.current,
+          backgroundColor: '#1a1a2e',
+          physics: {
+            default: 'arcade',
+            arcade: {
+              gravity: { y: 0 }, // We handle gravity manually
+              debug: false
+            }
           },
-          max: {
-            width: 1200,
-            height: 900
+          scene: GameScene,
+          scale: {
+            mode: PhaserModule.default.Scale.FIT,
+            autoCenter: PhaserModule.default.Scale.CENTER_BOTH,
+            min: {
+              width: 400,
+              height: 300
+            },
+            max: {
+              width: 1200,
+              height: 900
+            }
+          },
+          audio: {
+            disableWebAudio: false
           }
-        }
-      };
+        };
 
-      // Create Phaser game instance
-      const game = new Phaser.Game(config);
-      phaserGameRef.current = game;
+        // Create Phaser game instance
+        const game = new PhaserModule.default.Game(config);
+        phaserGameRef.current = game;
 
-      // Pass questions to the game scene
-      game.scene.start('GameScene', { questions: QUESTIONS });
+        // Wait for scene to be ready then pass questions
+        game.events.once('ready', () => {
+          const scene = game.scene.getScene('GameScene');
+          if (scene) {
+            scene.scene.restart({ questions: QUESTIONS });
+          }
+        });
 
-      setGameLoaded(true);
+        setGameLoaded(true);
+        console.log('Game initialized successfully');
 
-    } catch (err) {
-      console.error('Failed to initialize game:', err);
-      setError('Failed to load game. Please refresh the page.');
-    }
+      } catch (err) {
+        console.error('Failed to initialize game:', err);
+        setError('Failed to load game. Please refresh the page.');
+      }
+    };
+
+    initGame();
 
     // Cleanup function
     return () => {
@@ -122,19 +93,50 @@ export default function QuestGamePage() {
         phaserGameRef.current = null;
       }
     };
-  }, []);
+  }, [isClient]);
+
+  // Handle page visibility change to pause/resume game
+  useEffect(() => {
+    if (!isClient) return;
+
+    const handleVisibilityChange = () => {
+      if (phaserGameRef.current) {
+        if (document.hidden) {
+          phaserGameRef.current.scene.pause('GameScene');
+        } else {
+          phaserGameRef.current.scene.resume('GameScene');
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [isClient]);
+
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p className="text-white">Initializing...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">Game Error</h1>
-          <p className="text-gray-700 mb-4">{error}</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-900 to-gray-900">
+        <div className="text-center max-w-md mx-4">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+            <strong className="font-bold">Game Error!</strong>
+            <span className="block sm:inline"> {error}</span>
+          </div>
           <button 
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors"
           >
-            Reload Page
+            🔄 Reload Page
           </button>
         </div>
       </div>
@@ -142,64 +144,107 @@ export default function QuestGamePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col items-center justify-center p-4">
       {/* Game Title */}
       <div className="text-center mb-6">
-        <h1 className="text-4xl font-bold text-white mb-2">Quest Flight</h1>
-        <p className="text-gray-300">Fly through obstacles and answer questions to win!</p>
+        <h1 className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600 mb-2 animate-pulse-slow">
+          🚀 Quest Flight
+        </h1>
+        <p className="text-gray-300 text-lg">Navigate through space, dodge obstacles, and answer questions!</p>
       </div>
 
       {/* Game Container */}
       <div className="relative">
         <div 
           ref={gameRef} 
-          className="border-4 border-gray-700 rounded-lg overflow-hidden shadow-2xl"
+          className="border-4 border-gradient-to-r from-blue-500 to-purple-600 rounded-lg overflow-hidden shadow-2xl bg-black"
           style={{ 
             width: '800px', 
             height: '600px',
             maxWidth: '100vw',
-            maxHeight: '80vh'
+            maxHeight: '70vh'
           }}
         />
         
         {!gameLoaded && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-800 rounded-lg">
+          <div className="absolute inset-0 flex items-center justify-center bg-slate-800 rounded-lg">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-              <p className="text-white">Loading Game...</p>
+              <div className="relative">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 mx-auto mb-4"></div>
+                <div className="animate-ping absolute top-2 left-2 h-12 w-12 rounded-full bg-blue-400 opacity-20"></div>
+              </div>
+              <p className="text-white font-semibold">Loading Game Assets...</p>
+              <div className="mt-2">
+                <div className="bg-gray-700 rounded-full h-2 w-48 mx-auto">
+                  <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full animate-pulse" style={{width: '70%'}}></div>
+                </div>
+              </div>
             </div>
           </div>
         )}
       </div>
 
       {/* Game Instructions */}
-      <div className="mt-6 max-w-2xl text-center">
-        <h2 className="text-xl font-semibold text-white mb-3">How to Play</h2>
-        <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-300">
-          <div className="bg-gray-800 p-4 rounded-lg">
-            <h3 className="font-semibold text-blue-400 mb-2">Controls</h3>
-            <p><strong>Desktop:</strong> Press SPACEBAR to fly up</p>
-            <p><strong>Mobile:</strong> Tap screen to fly up</p>
-            <p>Release to let gravity pull you down</p>
+      <div className="mt-8 max-w-4xl text-center">
+        <h2 className="text-2xl font-semibold text-white mb-4">🎮 How to Play</h2>
+        <div className="grid md:grid-cols-3 gap-6 text-sm">
+          <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-xl border border-slate-700">
+            <div className="text-3xl mb-2">⌨️</div>
+            <h3 className="font-semibold text-blue-400 mb-3">Controls</h3>
+            <p className="text-gray-300"><strong>Desktop:</strong> Press SPACEBAR to fly up</p>
+            <p className="text-gray-300"><strong>Mobile:</strong> Tap screen to fly up</p>
+            <p className="text-gray-300 mt-2">Release to let gravity pull you down</p>
           </div>
-          <div className="bg-gray-800 p-4 rounded-lg">
-            <h3 className="font-semibold text-green-400 mb-2">Gameplay</h3>
-            <p>• Avoid red obstacles</p>
-            <p>• Answer questions when they appear</p>
-            <p>• Fly into the correct answer</p>
-            <p>• You have 3 lives - don't waste them!</p>
+          
+          <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-xl border border-slate-700">
+            <div className="text-3xl mb-2">🎯</div>
+            <h3 className="font-semibold text-green-400 mb-3">Gameplay</h3>
+            <p className="text-gray-300">• Avoid red obstacles falling from space</p>
+            <p className="text-gray-300">• Answer questions when they appear</p>
+            <p className="text-gray-300">• Fly into the correct answer zone</p>
+            <p className="text-gray-300">• Each correct answer = 10 points!</p>
+          </div>
+          
+          <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-xl border border-slate-700">
+            <div className="text-3xl mb-2">❤️</div>
+            <h3 className="font-semibold text-red-400 mb-3">Lives & Scoring</h3>
+            <p className="text-gray-300">• You start with 3 lives</p>
+            <p className="text-gray-300">• Lose 1 life for wrong answers</p>
+            <p className="text-gray-300">• Lose 1 life for hitting obstacles</p>
+            <p className="text-gray-300">• Get 70%+ to pass!</p>
           </div>
         </div>
       </div>
 
+      {/* Questions Preview */}
+      <div className="mt-6 text-center">
+        <p className="text-gray-400 text-sm">
+          📚 Ready to test your knowledge with <span className="text-blue-400 font-semibold">{QUESTIONS.length} questions</span>?
+        </p>
+      </div>
+
       {/* Navigation */}
-      <div className="mt-6">
+      <div className="mt-8 flex gap-4">
         <button 
           onClick={() => window.location.href = '/'}
-          className="px-6 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+          className="px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-lg hover:from-gray-700 hover:to-gray-800 transition-all duration-300 transform hover:scale-105 shadow-lg"
         >
           ← Back to Home
         </button>
+        
+        {gameLoaded && (
+          <button 
+            onClick={() => phaserGameRef.current?.scene.restart('GameScene')}
+            className="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+          >
+            🔄 Restart Game
+          </button>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="mt-8 text-center text-gray-500 text-xs">
+        <p>Best played on desktop • Mobile friendly • Made with Phaser & Next.js</p>
       </div>
     </div>
   );

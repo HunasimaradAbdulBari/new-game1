@@ -1,5 +1,3 @@
-// src/components/Quest/utils/gameLogic.js
-
 // Configuration constants
 export const GAME_CONFIG = {
   STARTING_LIVES: 3,
@@ -9,7 +7,8 @@ export const GAME_CONFIG = {
   SCORE_PER_CORRECT: 10,
   PLANE_IMPULSE: -300,
   GRAVITY: 500,
-  OBSTACLE_SPEED: 150
+  OBSTACLE_SPEED: 150,
+  PLANE_POSITION_X: 150
 };
 
 // Game states
@@ -36,6 +35,7 @@ export class GameLogic {
     this.wrongAnswers = 0;
     this.gameState = GAME_STATES.PLAYING;
     this.isInvulnerable = false;
+    this.invulnerabilityTimer = null;
   }
 
   // Question management
@@ -71,6 +71,8 @@ export class GameLogic {
 
   // Obstacle tracking
   passObstacle() {
+    if (this.gameState !== GAME_STATES.PLAYING) return false;
+    
     this.obstaclesPassed++;
     if (this.obstaclesPassed >= GAME_CONFIG.OBSTACLES_TO_QUESTION) {
       this.obstaclesPassed = 0;
@@ -93,7 +95,7 @@ export class GameLogic {
   // Answer validation
   submitAnswer(selectedAnswer) {
     const currentQuestion = this.getCurrentQuestion();
-    if (!currentQuestion) return false;
+    if (!currentQuestion) return { correct: false, gameEnded: true };
 
     const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
     
@@ -142,10 +144,22 @@ export class GameLogic {
   }
 
   // Invulnerability management
-  setInvulnerable(duration = GAME_CONFIG.INVULNERABILITY_MS_AFTER_HIT) {
+  setInvulnerable(scene, duration = GAME_CONFIG.INVULNERABILITY_MS_AFTER_HIT) {
     this.isInvulnerable = true;
-    setTimeout(() => {
+    
+    if (this.invulnerabilityTimer) {
+      this.invulnerabilityTimer.destroy();
+    }
+    
+    this.invulnerabilityTimer = scene.time.delayedCall(duration, () => {
       this.isInvulnerable = false;
-    }, duration);
+      this.invulnerabilityTimer = null;
+    });
+  }
+
+  // Load questions (for API integration later)
+  loadQuestions(newQuestions) {
+    this.questions = newQuestions;
+    this.reset();
   }
 }
