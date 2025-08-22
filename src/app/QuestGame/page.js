@@ -16,17 +16,24 @@ export default function QuestGamePage() {
   }, []);
 
   const handleHomeClick = useCallback(() => {
-    window.location.href = '/';
+    if (typeof window !== 'undefined') {
+      window.location.href = '/';
+    }
   }, []);
 
   const handleRestartClick = useCallback(() => {
     if (phaserGameRef.current) {
-      phaserGameRef.current.scene.restart('GameScene');
+      const scene = phaserGameRef.current.scene.getScene('GameScene');
+      if (scene) {
+        scene.scene.restart({ questions: QUESTIONS });
+      }
     }
   }, []);
 
   const handleReloadClick = useCallback(() => {
-    window.location.reload();
+    if (typeof window !== 'undefined') {
+      window.location.reload();
+    }
   }, []);
 
   useEffect(() => {
@@ -38,9 +45,11 @@ export default function QuestGamePage() {
 
     const initGame = async () => {
       try {
-        // Dynamic import of GameScene to avoid SSR issues
-        const { GameScene } = await import('../../components/Quest/scenes/GameScene.js');
-        const PhaserModule = await import('phaser');
+        // Dynamic imports to avoid SSR issues
+        const [PhaserModule, { GameScene }] = await Promise.all([
+          import('phaser'),
+          import('../../components/Quest/scenes/GameScene.js')
+        ]);
         
         // Phaser game configuration
         const config = {
@@ -75,19 +84,29 @@ export default function QuestGamePage() {
         const game = new PhaserModule.default.Game(config);
         phaserGameRef.current = game;
 
-        // Initialize with questions
-        setTimeout(() => {
+        // Wait for scene to be ready before initializing
+        game.events.on('ready', () => {
           const scene = game.scene.getScene('GameScene');
-          if (scene) {
+          if (scene && scene.scene) {
             scene.scene.restart({ questions: QUESTIONS });
           }
-        }, 100);
+          setGameLoaded(true);
+        });
 
-        setGameLoaded(true);
+        // Fallback timer in case 'ready' event doesn't fire
+        setTimeout(() => {
+          if (!gameLoaded) {
+            const scene = game.scene.getScene('GameScene');
+            if (scene && scene.scene) {
+              scene.scene.restart({ questions: QUESTIONS });
+            }
+            setGameLoaded(true);
+          }
+        }, 2000);
 
       } catch (err) {
         console.error('Failed to initialize game:', err);
-        setError('Failed to load game. Please refresh the page.');
+        setError(`Failed to load game: ${err.message || 'Unknown error'}. Please refresh the page.`);
       }
     };
 
@@ -96,11 +115,15 @@ export default function QuestGamePage() {
     // Cleanup function
     return () => {
       if (phaserGameRef.current) {
-        phaserGameRef.current.destroy(true);
-        phaserGameRef.current = null;
+        try {
+          phaserGameRef.current.destroy(true);
+          phaserGameRef.current = null;
+        } catch (error) {
+          console.warn('Error destroying Phaser game:', error);
+        }
       }
     };
-  }, [mounted]);
+  }, [mounted, gameLoaded]);
 
   // Show loading state until mounted
   if (!mounted) {
@@ -120,14 +143,21 @@ export default function QuestGamePage() {
         <div className="text-center max-w-md mx-4">
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
             <strong className="font-bold">Game Error!</strong>
-            <span className="block sm:inline"> {error}</span>
+            <span className="block sm:inline mt-2">{error}</span>
           </div>
           <button 
             type="button"
             onClick={handleReloadClick}
-            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors"
+            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors mr-2"
           >
             🔄 Reload Page
+          </button>
+          <button 
+            type="button"
+            onClick={handleHomeClick}
+            className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition-colors"
+          >
+            🏠 Home
           </button>
         </div>
       </div>
@@ -162,6 +192,7 @@ export default function QuestGamePage() {
             <div className="text-center">
               <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 mx-auto mb-4"></div>
               <p className="text-white font-semibold">Loading Game...</p>
+              <p className="text-gray-400 text-sm mt-2">Initializing Phaser...</p>
             </div>
           </div>
         )}
