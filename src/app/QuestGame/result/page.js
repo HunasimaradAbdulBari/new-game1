@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 export default function ResultPage() {
   const [results, setResults] = useState(null);
@@ -12,7 +12,7 @@ export default function ResultPage() {
   }, []);
 
   useEffect(() => {
-    if (!isClient) return;
+    if (!isClient || typeof window === 'undefined') return;
 
     // Get results from localStorage
     const savedResults = window.localStorage.getItem('gameResults');
@@ -33,15 +33,16 @@ export default function ResultPage() {
     }
   }, [isClient]);
 
-  const handlePlayAgain = () => {
-    if (typeof window !== 'undefined') {
+  // Fixed event handlers with client-side checks
+  const handlePlayAgain = useCallback(() => {
+    if (typeof window !== 'undefined' && isClient) {
       window.localStorage.removeItem('gameResults');
       window.location.href = '/QuestGame';
     }
-  };
+  }, [isClient]);
 
-  const handleShareScore = async () => {
-    if (!results) return;
+  const handleShareScore = useCallback(async () => {
+    if (!results || !isClient || typeof window === 'undefined') return;
 
     const shareData = {
       title: 'Quest Flight - Space Quiz Game',
@@ -59,10 +60,10 @@ export default function ResultPage() {
     } else {
       fallbackShare();
     }
-  };
+  }, [results, isClient]);
 
-  const fallbackShare = () => {
-    if (!results) return;
+  const fallbackShare = useCallback(() => {
+    if (!results || !isClient || typeof window === 'undefined') return;
 
     const shareText = `🚀 I scored ${results.score} points in Quest Flight! Got ${results.correctAnswers}/${results.totalQuestions} questions right (${results.percentage}%)! Play at ${window.location.origin}/QuestGame`;
     
@@ -75,7 +76,19 @@ export default function ResultPage() {
     } else {
       prompt('Copy this text to share your score:', shareText);
     }
-  };
+  }, [results, isClient]);
+
+  const handleReturnHome = useCallback(() => {
+    if (typeof window !== 'undefined' && isClient) {
+      window.location.href = '/';
+    }
+  }, [isClient]);
+
+  const handlePlayQuestGame = useCallback(() => {
+    if (typeof window !== 'undefined' && isClient) {
+      window.location.href = '/QuestGame';
+    }
+  }, [isClient]);
 
   if (!isClient) {
     return (
@@ -95,12 +108,15 @@ export default function ResultPage() {
           <div className="text-6xl mb-4">😅</div>
           <h1 className="text-2xl font-bold text-white mb-4">No Results Found</h1>
           <p className="text-gray-300 mb-6">It looks like you haven't played the game yet!</p>
-          <button
-            onClick={() => window.location.href = '/QuestGame'}
-            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
-          >
-            🚀 Play Quest Flight
-          </button>
+          {isClient && (
+            <button
+              type="button"
+              onClick={handlePlayQuestGame}
+              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+            >
+              🚀 Play Quest Flight
+            </button>
+          )}
         </div>
       </div>
     );
@@ -260,29 +276,34 @@ export default function ResultPage() {
             )}
           </div>
 
-          {/* Action Buttons */}
-          <div className="space-y-3">
-            <button
-              onClick={handlePlayAgain}
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 rounded-xl font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg text-lg"
-            >
-              🎮 Play Again
-            </button>
-            
-            <button
-              onClick={handleShareScore}
-              className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-4 rounded-xl font-semibold hover:from-green-600 hover:to-emerald-700 transition-all duration-300 transform hover:scale-105 shadow-lg text-lg"
-            >
-              📱 Share Score
-            </button>
-            
-            <button
-              onClick={() => window.location.href = '/'}
-              className="w-full bg-gradient-to-r from-gray-500 to-gray-600 text-white py-4 rounded-xl font-semibold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 shadow-lg text-lg"
-            >
-              🏠 Return Home
-            </button>
-          </div>
+          {/* Action Buttons - Only render when client is ready */}
+          {isClient && (
+            <div className="space-y-3">
+              <button
+                type="button"
+                onClick={handlePlayAgain}
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 rounded-xl font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg text-lg"
+              >
+                🎮 Play Again
+              </button>
+              
+              <button
+                type="button"
+                onClick={handleShareScore}
+                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-4 rounded-xl font-semibold hover:from-green-600 hover:to-emerald-700 transition-all duration-300 transform hover:scale-105 shadow-lg text-lg"
+              >
+                📱 Share Score
+              </button>
+              
+              <button
+                type="button"
+                onClick={handleReturnHome}
+                className="w-full bg-gradient-to-r from-gray-500 to-gray-600 text-white py-4 rounded-xl font-semibold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 shadow-lg text-lg"
+              >
+                🏠 Return Home
+              </button>
+            </div>
+          )}
 
           {/* Fun Stats */}
           <div className="mt-6 pt-6 border-t border-gray-200">

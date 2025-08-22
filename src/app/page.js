@@ -1,4 +1,45 @@
+'use client';
+
+import { useEffect, useState, useCallback } from 'react';
+
 export default function Home() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Fixed event handlers with client-side checks
+  const handleQuestGameClick = useCallback(() => {
+    if (typeof window !== 'undefined' && mounted) {
+      window.location.href = '/QuestGame';
+    }
+  }, [mounted]);
+
+  const handleResultsClick = useCallback(() => {
+    if (typeof window !== 'undefined' && mounted) {
+      window.location.href = '/QuestGame/result';
+    }
+  }, [mounted]);
+
+  const handleApiIntegrationClick = useCallback(() => {
+    if (mounted) {
+      alert('🔧 Coming Soon! API integration for dynamic questions will be available in the next update.');
+    }
+  }, [mounted]);
+
+  // Show loading state until mounted - FIXED SYNTAX ERROR
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p className="text-white">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
       {/* Animated background elements */}
@@ -73,10 +114,11 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Call to Action */}
+        {/* Call to Action - Only render when mounted */}
         <div className="space-y-6">
           <button
-            onClick={() => window.location.href = '/QuestGame'}
+            type="button"
+            onClick={handleQuestGameClick}
             className="px-12 py-4 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white text-xl font-bold rounded-2xl hover:shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-110 animate-pulse-slow"
           >
             🚀 Launch Quest Flight
@@ -84,14 +126,16 @@ export default function Home() {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <button
-              onClick={() => window.location.href = '/QuestGame/result'}
+              type="button"
+              onClick={handleResultsClick}
               className="px-6 py-2 bg-slate-700 text-gray-300 rounded-lg hover:bg-slate-600 transition-colors"
             >
               📊 View Sample Results
             </button>
             
             <button
-              onClick={() => alert('🔧 Coming Soon! API integration for dynamic questions will be available in the next update.')}
+              type="button"
+              onClick={handleApiIntegrationClick}
               className="px-6 py-2 bg-slate-700 text-gray-300 rounded-lg hover:bg-slate-600 transition-colors"
             >
               🔧 API Integration

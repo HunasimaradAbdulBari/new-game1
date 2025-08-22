@@ -15,30 +15,35 @@ export default function QuestGamePage() {
     setMounted(true);
   }, []);
 
+  // Use useCallback with proper dependencies and client-side checks
   const handleHomeClick = useCallback(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && mounted) {
       window.location.href = '/';
     }
-  }, []);
+  }, [mounted]);
 
   const handleRestartClick = useCallback(() => {
-    if (phaserGameRef.current) {
-      const scene = phaserGameRef.current.scene.getScene('GameScene');
-      if (scene) {
-        scene.scene.restart({ questions: QUESTIONS });
+    if (phaserGameRef.current && mounted) {
+      try {
+        const scene = phaserGameRef.current.scene.getScene('GameScene');
+        if (scene) {
+          scene.scene.restart({ questions: QUESTIONS });
+        }
+      } catch (error) {
+        console.error('Error restarting game:', error);
       }
     }
-  }, []);
+  }, [mounted]);
 
   const handleReloadClick = useCallback(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && mounted) {
       window.location.reload();
     }
-  }, []);
+  }, [mounted]);
 
   useEffect(() => {
     // Only run on client side after mount
-    if (!mounted) return;
+    if (!mounted || typeof window === 'undefined') return;
 
     // Prevent multiple game instances
     if (phaserGameRef.current) return;
@@ -145,20 +150,25 @@ export default function QuestGamePage() {
             <strong className="font-bold">Game Error!</strong>
             <span className="block sm:inline mt-2">{error}</span>
           </div>
-          <button 
-            type="button"
-            onClick={handleReloadClick}
-            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors mr-2"
-          >
-            🔄 Reload Page
-          </button>
-          <button 
-            type="button"
-            onClick={handleHomeClick}
-            className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition-colors"
-          >
-            🏠 Home
-          </button>
+          {/* Fixed button structure with proper event handling */}
+          {mounted && (
+            <>
+              <button 
+                type="button"
+                onClick={handleReloadClick}
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors mr-2"
+              >
+                🔄 Reload Page
+              </button>
+              <button 
+                type="button"
+                onClick={handleHomeClick}
+                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition-colors"
+              >
+                🏠 Home
+              </button>
+            </>
+          )}
         </div>
       </div>
     );
@@ -227,26 +237,28 @@ export default function QuestGamePage() {
         </div>
       </div>
 
-      {/* Navigation */}
-      <div className="mt-8 flex gap-4">
-        <button 
-          type="button"
-          onClick={handleHomeClick}
-          className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
-        >
-          ← Back to Home
-        </button>
-        
-        {gameLoaded && (
+      {/* Navigation - Only render when mounted */}
+      {mounted && (
+        <div className="mt-8 flex gap-4">
           <button 
             type="button"
-            onClick={handleRestartClick}
-            className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            onClick={handleHomeClick}
+            className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
           >
-            🔄 Restart
+            ← Back to Home
           </button>
-        )}
-      </div>
+          
+          {gameLoaded && (
+            <button 
+              type="button"
+              onClick={handleRestartClick}
+              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            >
+              🔄 Restart
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }
