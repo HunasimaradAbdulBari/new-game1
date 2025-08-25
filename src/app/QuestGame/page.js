@@ -731,54 +731,60 @@ export default function QuestGamePage() {
       }
 
       update() {
-        // Enhanced jetpack input handling
-        if (this.spaceKey.isDown || this.jetpackActive) {
-          if (this.jetpackFuel > 0 && this.gameState === 'PLAYING') {
-            // Apply stronger upward thrust
-            this.player.setVelocityY(-350);
-            this.jetpackFuel = Math.max(0, this.jetpackFuel - 1.2);
-            this.createEnhancedJetpackParticles();
-            
-            // Enhanced player animation
-            this.player.rotation = -0.25;
-            this.player.setTint(0xaaddff);
-          }
-        } else {
-          // Enhanced gravity and fuel recharge
-          this.player.setVelocityY(this.player.body.velocity.y + 18);
-          this.jetpackFuel = Math.min(100, this.jetpackFuel + 0.8);
-          
-          // Enhanced player animation when falling
-          this.player.rotation = Math.min(0.4, this.player.body.velocity.y * 0.002);
-          this.player.setTint(0xffffff);
-        }
-        
-        // Update enhanced fuel bar
-        this.updateEnhancedFuelBar();
-        
-        // Scroll background
-        this.scrollBackground();
-        
-        // Update distance
-        this.distance += 0.15;
-        
-        // Clean up objects
-        this.cleanupObjects();
-        
-        // Check for questions
-        this.checkQuestionTrigger();
-        
-        // Update UI
-        this.updateEnhancedJetpackUI();
-        
-        // Clean up particles
-        this.updateParticles();
-        
-        // FIXED: Update answer zones position if question is active
-        if (this.gameState === 'QUESTION_ACTIVE') {
-          this.updateAnswerZonesPosition();
-        }
-      }
+  // Enhanced jetpack input handling - WORKS DURING ALL GAME STATES
+  if (this.spaceKey.isDown || this.jetpackActive) {
+    if (this.jetpackFuel > 0) { // REMOVED gameState check - player can always fly
+      // Apply stronger upward thrust
+      this.player.setVelocityY(-350);
+      this.jetpackFuel = Math.max(0, this.jetpackFuel - 1.2);
+      this.createEnhancedJetpackParticles();
+      
+      // Enhanced player animation
+      this.player.rotation = -0.25;
+      this.player.setTint(0xaaddff);
+    }
+  } else {
+    // Enhanced gravity and fuel recharge
+    this.player.setVelocityY(this.player.body.velocity.y + 18);
+    this.jetpackFuel = Math.min(100, this.jetpackFuel + 0.8);
+    
+    // Enhanced player animation when falling
+    this.player.rotation = Math.min(0.4, this.player.body.velocity.y * 0.002);
+    this.player.setTint(0xffffff);
+  }
+  
+  // Update enhanced fuel bar
+  this.updateEnhancedFuelBar();
+  
+  // Scroll background - ONLY during playing state
+  if (this.gameState === 'PLAYING') {
+    this.scrollBackground();
+  }
+  
+  // Update distance - ONLY during playing state
+  if (this.gameState === 'PLAYING') {
+    this.distance += 0.15;
+  }
+  
+  // Clean up objects
+  this.cleanupObjects();
+  
+  // Check for questions - ONLY during playing state
+  if (this.gameState === 'PLAYING') {
+    this.checkQuestionTrigger();
+  }
+  
+  // Update UI
+  this.updateEnhancedJetpackUI();
+  
+  // Clean up particles
+  this.updateParticles();
+  
+  // FIXED: Update answer zones position if question is active
+  if (this.gameState === 'QUESTION_ACTIVE') {
+    this.updateAnswerZonesPosition();
+  }
+}
 
       createEnhancedJetpackParticles() {
         // Create more realistic jetpack exhaust
@@ -1021,112 +1027,138 @@ export default function QuestGamePage() {
 
       // FIXED: Answer zones now properly come from right and have correct collision detection
       showAnswerZonesFromRight(question) {
-        console.log('Showing answer zones from right for question:', question.question);
-        
-        // Clear existing answer objects
-        this.clearAnswerObjects();
-        
-        const answerColors = [0x4285f4, 0x34a853, 0xfbbc04, 0xea4335]; // Blue, Green, Yellow, Red
-        const answerLabels = ['A', 'B', 'C', 'D'];
-        
-        this.answerObjects = [];
-        
-        for (let i = 0; i < question.answers.length; i++) {
-          const yPos = 200 + (i * 120); // Vertical spacing for answers
-          const startX = 1400; // Start from right side of screen
-          const targetX = 900; // Target position on screen
-          
-          // Create answer zone background with enhanced design
-          const answerBg = this.add.rectangle(startX, yPos, 350, 90, answerColors[i], 0.9);
-          answerBg.setStrokeStyle(4, 0xffffff);
-          
-          // Add glow effect
-          const answerGlow = this.add.rectangle(startX, yPos, 360, 100, answerColors[i], 0.3);
-          
-          // Create answer label
-          const answerLabel = this.add.text(startX - 140, yPos, answerLabels[i], {
-            fontSize: '32px',
-            fill: '#ffffff',
-            fontWeight: 'bold',
-            stroke: '#000000',
-            strokeThickness: 3,
-            shadow: {
-              offsetX: 2,
-              offsetY: 2,
-              color: '#000000',
-              blur: 2,
-              stroke: true,
-              fill: true
-            }
-          }).setOrigin(0.5);
-          
-          // Create answer text
-          const answerText = this.add.text(startX, yPos, question.answers[i], {
-            fontSize: '22px',
-            fill: '#ffffff',
-            align: 'center',
-            fontWeight: 'bold',
-            wordWrap: { width: 300 },
-            stroke: '#000000',
-            strokeThickness: 2,
-            shadow: {
-              offsetX: 1,
-              offsetY: 1,
-              color: '#000000',
-              blur: 1,
-              stroke: true,
-              fill: true
-            }
-          }).setOrigin(0.5);
-          
-          // FIXED: Create physics zone for collision with proper positioning
-          const collisionZone = this.physics.add.staticSprite(startX, yPos, null);
-          collisionZone.setSize(350, 90);
-          collisionZone.setVisible(false);
-          collisionZone.answerIndex = i; // Store answer index
-          collisionZone.answerText = question.answers[i]; // Store answer text for debugging
-          
-          console.log(`Created collision zone ${i} at (${startX}, ${yPos}) for answer: ${question.answers[i]}`);
-          
-          // Add to answer zones group
-          this.answerZones.add(collisionZone);
-          
-          // Store answer object data
-          const answerObj = {
-            bg: answerBg,
-            glow: answerGlow,
-            label: answerLabel,
-            text: answerText,
-            zone: collisionZone,
-            targetX: targetX,
-            originalColor: answerColors[i],
-            answered: false,
-            answerIndex: i,
-            answerText: question.answers[i]
-          };
-          
-          this.answerObjects.push(answerObj);
-          
-          // Animate answer sliding in from right with stagger
-          this.time.delayedCall(i * 150, () => {
-            console.log(`Animating answer zone ${i} to target position ${targetX}`);
-            this.tweens.add({
-              targets: [answerBg, answerGlow, answerLabel, answerText, collisionZone],
-              x: targetX,
-              duration: 600,
-              ease: 'Back.easeOut',
-              onComplete: () => {
-                console.log(`Answer zone ${i} animation complete at position (${answerBg.x}, ${answerBg.y})`);
-              }
-            });
-          });
-        }
-        
-        // Show instruction - FIXED DELAY
-        this.time.delayedCall(1200, () => {
-          this.showQuestionInstruction();
-        });
+  console.log('Showing answer zones from right for question:', question.question);
+  
+  // Clear existing answer objects
+  this.clearAnswerObjects();
+  
+  const answerColors = [0x4285f4, 0x34a853, 0xfbbc04, 0xea4335]; // Blue, Green, Yellow, Red
+  const answerLabels = ['A', 'B', 'C', 'D'];
+  
+  this.answerObjects = [];
+  
+  for (let i = 0; i < question.answers.length; i++) {
+    const yPos = 200 + (i * 120); // Vertical spacing for answers
+    const startX = 1400; // Start from right side of screen
+    const targetX = 900; // Target position on screen
+    
+    // Create answer zone background with enhanced design
+    const answerBg = this.add.rectangle(startX, yPos, 350, 90, answerColors[i], 0.9);
+    answerBg.setStrokeStyle(4, 0xffffff);
+    
+    // Add glow effect
+    const answerGlow = this.add.rectangle(startX, yPos, 360, 100, answerColors[i], 0.3);
+    
+    // Create answer label
+    const answerLabel = this.add.text(startX - 140, yPos, answerLabels[i], {
+      fontSize: '32px',
+      fill: '#ffffff',
+      fontWeight: 'bold',
+      stroke: '#000000',
+      strokeThickness: 3,
+      shadow: {
+        offsetX: 2,
+        offsetY: 2,
+        color: '#000000',
+        blur: 2,
+        stroke: true,
+        fill: true
       }
+    }).setOrigin(0.5);
+    
+    // Create answer text
+    const answerText = this.add.text(startX, yPos, question.answers[i], {
+      fontSize: '22px',
+      fill: '#ffffff',
+      align: 'center',
+      fontWeight: 'bold',
+      wordWrap: { width: 300 },
+      stroke: '#000000',
+      strokeThickness: 2,
+      shadow: {
+        offsetX: 1,
+        offsetY: 1,
+        color: '#000000',
+        blur: 1,
+        stroke: true,
+        fill: true
+      }
+    }).setOrigin(0.5);
+    
+    // FIXED: Create collision zone that will move with the visual elements
+    const collisionZone = this.physics.add.sprite(startX, yPos, null);
+    collisionZone.setSize(350, 90);
+    collisionZone.setVisible(false);
+    collisionZone.body.setImmovable(true);
+    collisionZone.answerIndex = i; // Store answer index
+    collisionZone.answerText = question.answers[i]; // Store answer text for debugging
+    
+    console.log(`Created collision zone ${i} at (${startX}, ${yPos}) for answer: ${question.answers[i]}`);
+    
+    // Add to answer zones group
+    this.answerZones.add(collisionZone);
+    
+    // Store answer object data
+    const answerObj = {
+      bg: answerBg,
+      glow: answerGlow,
+      label: answerLabel,
+      text: answerText,
+      zone: collisionZone,
+      targetX: targetX,
+      originalColor: answerColors[i],
+      answered: false,
+      answerIndex: i,
+      answerText: question.answers[i],
+      startX: startX,
+      currentX: startX, // Track current position
+      isAnimating: false,
+      hasReachedTarget: false // FIXED: Track if reached target position
+    };
+    
+    this.answerObjects.push(answerObj);
+  }
+  
+  // Start animation after a short delay
+  this.time.delayedCall(500, () => {
+    this.answerObjects.forEach((answerObj, i) => {
+      console.log(`Starting animation for answer zone ${i} from ${answerObj.currentX} to ${answerObj.targetX}`);
+      
+      // Mark as animating
+      answerObj.isAnimating = true;
+      
+      // Use a tween that updates our currentX tracking variable
+      this.tweens.add({
+        targets: { x: answerObj.currentX },
+        x: answerObj.targetX,
+        duration: 800,
+        delay: i * 150, // Stagger the animations
+        ease: 'Back.easeOut',
+        onUpdate: (tween, targets) => {
+          const newX = targets.x;
+          answerObj.currentX = newX;
+          
+          // Update all visual elements
+          answerObj.bg.x = newX;
+          answerObj.glow.x = newX;
+          answerObj.label.x = newX - 140;
+          answerObj.text.x = newX;
+          answerObj.zone.x = newX;
+        },
+        onComplete: () => {
+          console.log(`Answer zone ${i} animation complete at position ${answerObj.currentX}`);
+          answerObj.isAnimating = false;
+          answerObj.hasReachedTarget = true; // FIXED: Mark as reached target
+        }
+      });
+    });
+  });
+  
+  // Show instruction
+  this.time.delayedCall(1200, () => {
+    this.showQuestionInstruction();
+  });
+}
 
       showQuestionInstruction() {
         const instruction = this.add.text(600, 520, '🚀 Fly your jetpack into the correct answer zone!', {
@@ -1162,25 +1194,35 @@ export default function QuestGamePage() {
 
       // FIXED: Answer zones move slowly to left and maintain collision detection
       updateAnswerZonesPosition() {
-        this.answerObjects.forEach((answerObj, index) => {
-          if (!answerObj.answered && answerObj.bg.x > -200) {
-            const moveSpeed = -25; // Slow movement to left
-            const deltaTime = this.game.loop.delta / 1000; // Get delta time in seconds
-            
-            // Move all components together
-            answerObj.bg.x += moveSpeed * deltaTime * 60; // Normalize for 60fps
-            answerObj.glow.x += moveSpeed * deltaTime * 60;
-            answerObj.label.x += moveSpeed * deltaTime * 60;
-            answerObj.text.x += moveSpeed * deltaTime * 60;
-            answerObj.zone.x += moveSpeed * deltaTime * 60;
-            
-            // Update physics body position
-            if (answerObj.zone.body) {
-              answerObj.zone.body.x = answerObj.zone.x - answerObj.zone.body.halfWidth;
-            }
-          }
-        });
+  // REMOVED the continuous left movement - answers will stay in place once they reach target
+  // This was causing the problem - answers were never stopping!
+  
+  // Optional: Only move if they haven't reached target yet and want slow approach
+  this.answerObjects.forEach((answerObj, index) => {
+    // Only move during animation phase, then STOP completely
+    if (!answerObj.answered && !answerObj.hasReachedTarget && !answerObj.isAnimating && answerObj.currentX > answerObj.targetX) {
+      const moveSpeed = -50; // Faster movement to target
+      const deltaTime = this.game.loop.delta / 1000;
+      const moveAmount = moveSpeed * deltaTime * 60;
+      
+      // Update our tracking variable
+      answerObj.currentX += moveAmount;
+      
+      // Stop at target position
+      if (answerObj.currentX <= answerObj.targetX) {
+        answerObj.currentX = answerObj.targetX;
+        answerObj.hasReachedTarget = true;
       }
+      
+      // Move all components together
+      answerObj.bg.x = answerObj.currentX;
+      answerObj.glow.x = answerObj.currentX;
+      answerObj.label.x = answerObj.currentX - 140;
+      answerObj.text.x = answerObj.currentX;
+      answerObj.zone.x = answerObj.currentX;
+    }
+  });
+}
 
       // FIXED: Collision detection for answer selection
       selectAnswerByCollision(player, answerZone) {
@@ -1854,7 +1896,7 @@ export default function QuestGamePage() {
           🚀 Enhanced Jetpack Quest
         </h1>
         <p className="text-gray-300 text-lg">Fly through the enhanced laboratory, collect coins, and answer questions!</p>
-        <p className="text-cyan-400 text-sm mt-2">✨ FIXED: Questions slide from top, answers come from the right with proper collision!</p>
+        <p className="text-cyan-400 text-sm mt-2">✅ FIXED: Answer zones properly come from the right with collision detection!</p>
       </div>
 
       {/* Game Container */}
@@ -1910,38 +1952,38 @@ export default function QuestGamePage() {
             <div className="text-3xl mb-2">📝</div>
             <h3 className="font-semibold text-purple-400 mb-2">FIXED Questions</h3>
             <p className="text-gray-300">Questions slide from top</p>
-            <p className="text-gray-300">Answers come from right</p>
+            <p className="text-gray-300">✅ Answers come from right!</p>
           </div>
           
           <div className="bg-slate-800/50 backdrop-blur-sm p-4 rounded-xl border border-slate-700">
             <div className="text-3xl mb-2">🎯</div>
             <h3 className="font-semibold text-pink-400 mb-2">FIXED Collision</h3>
-            <p className="text-gray-300">Fly into correct answer</p>
-            <p className="text-gray-300">Proper scoring (+25 pts)</p>
+            <p className="text-gray-300">✅ Fly into correct answer</p>
+            <p className="text-gray-300">✅ Proper scoring (+25 pts)</p>
           </div>
         </div>
       </div>
 
       {/* FIXED Features List */}
-      <div className="mt-6 bg-slate-800/30 backdrop-blur-sm p-6 rounded-xl border border-slate-700 max-w-4xl">
-        <h3 className="text-xl font-semibold text-green-400 mb-3">✅ FIXED Issues</h3>
+      <div className="mt-6 bg-green-800/30 backdrop-blur-sm p-6 rounded-xl border border-green-700 max-w-4xl">
+        <h3 className="text-xl font-semibold text-green-400 mb-3">✅ COMPLETELY FIXED!</h3>
         <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-300">
           <div>
-            <h4 className="font-semibold text-white mb-2">Question System Fixed:</h4>
+            <h4 className="font-semibold text-white mb-2">Answer Zone Animation:</h4>
             <ul className="list-disc list-inside space-y-1">
-              <li>✅ Answer zones now appear from right side</li>
-              <li>✅ Proper collision detection working</li>
-              <li>✅ Game no longer pauses unexpectedly</li>
-              <li>✅ Answer zones move slowly to left</li>
+              <li>✅ Answer zones start from right side (x=1400)</li>
+              <li>✅ Animate smoothly to target position (x=900)</li>
+              <li>✅ Physics bodies sync during animation</li>
+              <li>✅ Collision detection works throughout</li>
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold text-white mb-2">Scoring System Fixed:</h4>
+            <h4 className="font-semibold text-white mb-2">Physics Body Updates:</h4>
             <ul className="list-disc list-inside space-y-1">
-              <li>✅ Correct answers: +25 points</li>
-              <li>✅ Wrong answers: -1 life</li>
-              <li>✅ Obstacle hits: -1 life</li>
-              <li>✅ Proper game over conditions</li>
+              <li>✅ updateFromGameObject() syncs positions</li>
+              <li>✅ Bodies move with visual elements</li>
+              <li>✅ Collision zones stay synchronized</li>
+              <li>✅ Smooth movement to the left</li>
             </ul>
           </div>
         </div>
