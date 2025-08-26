@@ -49,39 +49,39 @@ export default function QuestGamePage() {
       try {
         setIsLoading(true);
         setError(null);
-        console.log('🚀 Starting PERFECT COLLISION Jetpack game...');
+        console.log('🚀 Starting ENHANCED UI Jetpack game...');
 
         await loadPhaserFromCDN();
         console.log('✅ Phaser loaded successfully');
 
-        const PerfectCollisionJetpackScene = createPerfectCollisionJetpackScene();
-        console.log('✅ Perfect collision scene created');
+        const EnhancedJetpackScene = createEnhancedJetpackScene();
+        console.log('✅ Enhanced UI scene created');
 
         const config = {
           type: window.Phaser.AUTO,
-          width: 1200,
-          height: 600,
+          width: 1400, // Increased from 1200
+          height: 700, // Increased from 600
           parent: gameRef.current,
           backgroundColor: '#0a0a0f',
           physics: {
             default: 'arcade',
             arcade: {
               gravity: { y: 800 },
-              debug: false // Set to true to see collision boxes
+              debug: false
             }
           },
-          scene: PerfectCollisionJetpackScene,
+          scene: EnhancedJetpackScene,
           scale: {
             mode: window.Phaser.Scale.FIT,
             autoCenter: window.Phaser.Scale.CENTER_BOTH,
-            min: { width: 600, height: 300 },
-            max: { width: 1600, height: 800 }
+            min: { width: 800, height: 500 },
+            max: { width: 1920, height: 1080 }
           }
         };
 
         const game = new window.Phaser.Game(config);
         phaserGameRef.current = game;
-        console.log('✅ Perfect collision Phaser game created');
+        console.log('✅ Enhanced UI Phaser game created');
 
         setTimeout(() => {
           try {
@@ -91,7 +91,7 @@ export default function QuestGamePage() {
             }
             setGameLoaded(true);
             setIsLoading(false);
-            console.log('🎯 PERFECT COLLISION game loaded successfully!');
+            console.log('🎯 Enhanced UI game loaded successfully!');
           } catch (err) {
             console.error('Error initializing scene:', err);
             setError('Failed to initialize game scene. Please try reloading.');
@@ -142,8 +142,8 @@ export default function QuestGamePage() {
     });
   };
 
-  // 🔥 PERFECT COLLISION JETPACK GAME SCENE
-  const createPerfectCollisionJetpackScene = () => {
+  // 🔥 ENHANCED UI JETPACK GAME SCENE
+  const createEnhancedJetpackScene = () => {
     class JetpackGameScene extends window.Phaser.Scene {
       constructor() {
         super({ key: 'JetpackGameScene' });
@@ -229,209 +229,243 @@ export default function QuestGamePage() {
       }
 
       createEnhancedJetpackAssets() {
-        // Enhanced jetpack character
+        // Enhanced jetpack character with better details
         const playerGraphics = this.add.graphics();
         
-        // Character body
-        playerGraphics.fillStyle(0x0066cc);
-        playerGraphics.fillRoundedRect(8, 15, 24, 30, 4);
+        // Character body with gradient effect
+        playerGraphics.fillStyle(0x0077ee);
+        playerGraphics.fillRoundedRect(10, 18, 28, 35, 5);
+        playerGraphics.fillStyle(0x0055bb);
+        playerGraphics.fillRoundedRect(12, 20, 24, 6, 3);
         
-        // Character head
+        // Character head with better shading
         playerGraphics.fillStyle(0xffcc99);
-        playerGraphics.fillCircle(20, 12, 10);
+        playerGraphics.fillCircle(24, 14, 12);
+        playerGraphics.fillStyle(0xeeaa77);
+        playerGraphics.fillEllipse(24, 16, 10, 8);
         
-        // Enhanced helmet with visor
+        // Enhanced helmet with better visor
+        playerGraphics.fillStyle(0x444444);
+        playerGraphics.fillRoundedRect(14, 6, 20, 10, 3);
+        playerGraphics.fillStyle(0x77ddff, 0.9);
+        playerGraphics.fillEllipse(19, 10, 5, 4);
+        playerGraphics.fillEllipse(29, 10, 5, 4);
+        playerGraphics.fillStyle(0xffffff, 0.6);
+        playerGraphics.fillEllipse(18, 9, 2, 1);
+        playerGraphics.fillEllipse(28, 9, 2, 1);
+        
+        // Enhanced jetpack with more detail
+        playerGraphics.fillStyle(0x777777);
+        playerGraphics.fillRoundedRect(5, 22, 12, 26, 4);
+        playerGraphics.fillRoundedRect(31, 22, 12, 26, 4);
+        
+        // Jetpack fuel tanks with better design
+        playerGraphics.fillStyle(0x999999);
+        playerGraphics.fillRoundedRect(6, 24, 10, 22, 3);
+        playerGraphics.fillRoundedRect(32, 24, 10, 22, 3);
+        
+        // Jetpack details and lights
+        playerGraphics.fillStyle(0xffbb00);
+        playerGraphics.fillRect(7, 26, 8, 4);
+        playerGraphics.fillRect(33, 26, 8, 4);
+        playerGraphics.fillStyle(0xff7700);
+        playerGraphics.fillRect(8, 32, 6, 3);
+        playerGraphics.fillRect(34, 32, 6, 3);
+        
+        // Status lights
+        playerGraphics.fillStyle(0x00ff44);
+        playerGraphics.fillCircle(11, 38, 2);
+        playerGraphics.fillCircle(37, 38, 2);
+        
+        // Enhanced arms with better gloves
+        playerGraphics.fillStyle(0xffcc99);
+        playerGraphics.fillCircle(6, 28, 5);
+        playerGraphics.fillCircle(42, 28, 5);
+        playerGraphics.fillStyle(0x555555);
+        playerGraphics.fillCircle(6, 28, 3);
+        playerGraphics.fillCircle(42, 28, 3);
+        
+        // Enhanced legs with better boots
+        playerGraphics.fillStyle(0x0077ee);
+        playerGraphics.fillRoundedRect(15, 48, 8, 18, 3);
+        playerGraphics.fillRoundedRect(25, 48, 8, 18, 3);
+        
+        // Enhanced boots with treads
         playerGraphics.fillStyle(0x333333);
-        playerGraphics.fillRoundedRect(12, 5, 16, 8, 2);
-        playerGraphics.fillStyle(0x66ccff, 0.8);
-        playerGraphics.fillEllipse(16, 8, 4, 3);
-        playerGraphics.fillEllipse(24, 8, 4, 3);
-        playerGraphics.fillStyle(0xffffff, 0.4);
-        playerGraphics.fillEllipse(15, 7, 2, 1);
-        playerGraphics.fillEllipse(23, 7, 2, 1);
+        playerGraphics.fillRoundedRect(13, 62, 12, 8, 4);
+        playerGraphics.fillRoundedRect(23, 62, 12, 8, 4);
         
-        // Enhanced jetpack
-        playerGraphics.fillStyle(0x666666);
-        playerGraphics.fillRoundedRect(4, 18, 10, 22, 3);
-        playerGraphics.fillRoundedRect(26, 18, 10, 22, 3);
+        // Boot treads
+        playerGraphics.fillStyle(0x555555);
+        playerGraphics.fillRect(14, 66, 10, 2);
+        playerGraphics.fillRect(24, 66, 10, 2);
         
-        // Jetpack fuel tanks
-        playerGraphics.fillStyle(0x888888);
-        playerGraphics.fillRoundedRect(5, 20, 8, 18, 2);
-        playerGraphics.fillRoundedRect(27, 20, 8, 18, 2);
-        
-        // Jetpack details
-        playerGraphics.fillStyle(0xffaa00);
-        playerGraphics.fillRect(6, 22, 6, 3);
-        playerGraphics.fillRect(28, 22, 6, 3);
-        playerGraphics.fillStyle(0xff6600);
-        playerGraphics.fillRect(7, 26, 4, 2);
-        playerGraphics.fillRect(29, 26, 4, 2);
-        
-        // Enhanced arms with gloves
-        playerGraphics.fillStyle(0xffcc99);
-        playerGraphics.fillCircle(4, 25, 4);
-        playerGraphics.fillCircle(36, 25, 4);
-        playerGraphics.fillStyle(0x444444);
-        playerGraphics.fillCircle(4, 25, 2);
-        playerGraphics.fillCircle(36, 25, 2);
-        
-        // Enhanced legs
-        playerGraphics.fillStyle(0x0066cc);
-        playerGraphics.fillRoundedRect(12, 40, 7, 15, 2);
-        playerGraphics.fillRoundedRect(21, 40, 7, 15, 2);
-        
-        // Enhanced boots
-        playerGraphics.fillStyle(0x222222);
-        playerGraphics.fillRoundedRect(10, 52, 11, 6, 3);
-        playerGraphics.fillRoundedRect(19, 52, 11, 6, 3);
-        
-        // Boot details
-        playerGraphics.fillStyle(0x444444);
-        playerGraphics.fillRect(11, 54, 9, 2);
-        playerGraphics.fillRect(20, 54, 9, 2);
-        
-        playerGraphics.generateTexture('enhanced-jetpack-player', 40, 58);
+        playerGraphics.generateTexture('enhanced-jetpack-player', 48, 70);
         playerGraphics.destroy();
 
         this.createEnhancedObstacles();
 
-        // Enhanced coin design
+        // Enhanced coin with better animation potential
         const coinGraphics = this.add.graphics();
         coinGraphics.fillStyle(0xffdd00);
-        coinGraphics.fillCircle(12, 12, 12);
+        coinGraphics.fillCircle(14, 14, 14);
         coinGraphics.fillStyle(0xffff44);
-        coinGraphics.fillCircle(12, 12, 9);
+        coinGraphics.fillCircle(14, 14, 11);
         coinGraphics.fillStyle(0xffdd00);
-        coinGraphics.fillRect(8, 10, 8, 4);
+        coinGraphics.fillRect(9, 11, 10, 6);
         coinGraphics.fillStyle(0xffaa00);
-        coinGraphics.fillCircle(12, 12, 6);
+        coinGraphics.fillCircle(14, 14, 8);
         coinGraphics.fillStyle(0xffff88);
-        coinGraphics.fillCircle(12, 10, 3);
-        coinGraphics.generateTexture('enhanced-coin', 24, 24);
+        coinGraphics.fillCircle(14, 12, 4);
+        coinGraphics.fillStyle(0xffffff);
+        coinGraphics.fillCircle(14, 10, 2);
+        coinGraphics.generateTexture('enhanced-coin', 28, 28);
         coinGraphics.destroy();
 
         this.createEnhancedBackground();
       }
 
       createEnhancedObstacles() {
-        // Enhanced laser obstacle
+        // Enhanced laser obstacle with better effects
         const laserGraphics = this.add.graphics();
-        laserGraphics.fillStyle(0xff0000, 0.9);
-        laserGraphics.fillRect(0, 0, 18, 350);
-        laserGraphics.fillStyle(0xff6666, 0.7);
-        laserGraphics.fillRect(3, 0, 12, 350);
-        laserGraphics.fillStyle(0xffffff, 0.9);
-        laserGraphics.fillRect(7, 0, 4, 350);
+        laserGraphics.fillStyle(0xff0000, 0.95);
+        laserGraphics.fillRect(0, 0, 20, 400);
+        laserGraphics.fillStyle(0xff6666, 0.8);
+        laserGraphics.fillRect(3, 0, 14, 400);
+        laserGraphics.fillStyle(0xffffff, 0.95);
+        laserGraphics.fillRect(8, 0, 4, 400);
         
-        for (let i = 0; i < 350; i += 20) {
-          laserGraphics.fillStyle(0xffaaaa, 0.5);
-          laserGraphics.fillRect(5, i, 8, 10);
+        // Enhanced pulse effect
+        for (let i = 0; i < 400; i += 25) {
+          laserGraphics.fillStyle(0xffaaaa, 0.6);
+          laserGraphics.fillRect(6, i, 8, 15);
+          laserGraphics.fillStyle(0xffffff, 0.8);
+          laserGraphics.fillRect(9, i + 5, 2, 5);
         }
-        laserGraphics.generateTexture('enhanced-laser-obstacle', 18, 350);
+        laserGraphics.generateTexture('enhanced-laser-obstacle', 20, 400);
         laserGraphics.destroy();
 
-        // Enhanced missile
+        // Enhanced missile with better flame
         const missileGraphics = this.add.graphics();
-        missileGraphics.fillStyle(0x666666);
-        missileGraphics.fillEllipse(20, 10, 35, 18);
-        missileGraphics.fillStyle(0xff4444);
-        missileGraphics.fillTriangle(2, 10, 12, 6, 12, 14);
-        missileGraphics.fillStyle(0x444444);
-        missileGraphics.fillRect(25, 8, 10, 4);
-        missileGraphics.fillStyle(0xffaa00);
-        missileGraphics.fillTriangle(35, 10, 42, 7, 42, 13);
+        missileGraphics.fillStyle(0x777777);
+        missileGraphics.fillEllipse(22, 12, 40, 20);
+        missileGraphics.fillStyle(0xff5555);
+        missileGraphics.fillTriangle(2, 12, 14, 7, 14, 17);
+        missileGraphics.fillStyle(0x555555);
+        missileGraphics.fillRect(28, 9, 12, 6);
+        missileGraphics.fillStyle(0xffbb00);
+        missileGraphics.fillTriangle(40, 12, 48, 8, 48, 16);
         
-        // Add flame effect
-        missileGraphics.fillStyle(0xff6600, 0.8);
-        missileGraphics.fillTriangle(42, 10, 50, 8, 50, 12);
-        missileGraphics.fillStyle(0xffaa00, 0.6);
-        missileGraphics.fillTriangle(50, 10, 55, 9, 55, 11);
-        missileGraphics.generateTexture('enhanced-missile-obstacle', 55, 18);
+        // Enhanced flame trail
+        missileGraphics.fillStyle(0xff7700, 0.9);
+        missileGraphics.fillTriangle(48, 12, 58, 9, 58, 15);
+        missileGraphics.fillStyle(0xffbb00, 0.7);
+        missileGraphics.fillTriangle(58, 12, 65, 10, 65, 14);
+        missileGraphics.fillStyle(0xffffff, 0.5);
+        missileGraphics.fillTriangle(65, 12, 70, 11, 70, 13);
+        
+        // Missile details
+        missileGraphics.fillStyle(0x333333);
+        missileGraphics.fillRect(30, 10, 8, 4);
+        missileGraphics.generateTexture('enhanced-missile-obstacle', 70, 22);
         missileGraphics.destroy();
 
-        // Enhanced electric obstacle
+        // Enhanced electric obstacle with better lightning
         const electricGraphics = this.add.graphics();
-        electricGraphics.lineStyle(6, 0x00ffff, 1);
-        for (let i = 0; i < 12; i++) {
+        electricGraphics.lineStyle(8, 0x00ffff, 1);
+        for (let i = 0; i < 15; i++) {
           const x = i * 4;
-          const y1 = Math.sin(i * 0.8) * 25 + 60;
-          const y2 = Math.sin((i + 1) * 0.8) * 25 + 60;
+          const y1 = Math.sin(i * 0.9) * 30 + 70;
+          const y2 = Math.sin((i + 1) * 0.9) * 30 + 70;
           electricGraphics.lineBetween(x, y1, x + 4, y2);
         }
-        electricGraphics.lineStyle(3, 0xffffff, 1);
-        for (let i = 0; i < 12; i++) {
+        electricGraphics.lineStyle(4, 0xffffff, 1);
+        for (let i = 0; i < 15; i++) {
           const x = i * 4;
-          const y1 = Math.sin(i * 0.8) * 25 + 60;
-          const y2 = Math.sin((i + 1) * 0.8) * 25 + 60;
+          const y1 = Math.sin(i * 0.9) * 30 + 70;
+          const y2 = Math.sin((i + 1) * 0.9) * 30 + 70;
+          electricGraphics.lineBetween(x, y1, x + 4, y2);
+        }
+        electricGraphics.lineStyle(2, 0xccffff, 1);
+        for (let i = 0; i < 15; i++) {
+          const x = i * 4;
+          const y1 = Math.sin(i * 0.9) * 30 + 70;
+          const y2 = Math.sin((i + 1) * 0.9) * 30 + 70;
           electricGraphics.lineBetween(x, y1, x + 4, y2);
         }
         
-        for (let i = 0; i < 8; i++) {
+        // Enhanced sparks
+        for (let i = 0; i < 12; i++) {
           electricGraphics.fillStyle(0xffffff);
-          electricGraphics.fillCircle(Math.random() * 48, 30 + Math.random() * 60, 2);
+          electricGraphics.fillCircle(Math.random() * 60, 40 + Math.random() * 60, 3);
+          electricGraphics.fillStyle(0x88ffff);
+          electricGraphics.fillCircle(Math.random() * 60, 40 + Math.random() * 60, 2);
         }
-        electricGraphics.generateTexture('enhanced-electric-obstacle', 48, 120);
+        electricGraphics.generateTexture('enhanced-electric-obstacle', 60, 140);
         electricGraphics.destroy();
       }
 
       createEnhancedBackground() {
         const bgGraphics = this.add.graphics();
         
-        // Enhanced gradient background
-        bgGraphics.fillGradientStyle(0x0a0a1a, 0x1a1a3a, 0x0f0f2f, 0x2a2a4a, 1);
-        bgGraphics.fillRect(0, 0, 1200, 600);
+        // Enhanced gradient background with better colors
+        bgGraphics.fillGradientStyle(0x0a0a22, 0x1a1a44, 0x0f0f33, 0x2a2a55, 1);
+        bgGraphics.fillRect(0, 0, 1400, 700);
         
-        // Add grid pattern
-        bgGraphics.lineStyle(1, 0x333366, 0.4);
-        for (let x = 0; x < 1200; x += 40) {
-          bgGraphics.lineBetween(x, 0, x, 600);
+        // Enhanced grid pattern
+        bgGraphics.lineStyle(1, 0x4444aa, 0.5);
+        for (let x = 0; x < 1400; x += 50) {
+          bgGraphics.lineBetween(x, 0, x, 700);
         }
-        for (let y = 0; y < 600; y += 40) {
-          bgGraphics.lineBetween(0, y, 1200, y);
+        for (let y = 0; y < 700; y += 50) {
+          bgGraphics.lineBetween(0, y, 1400, y);
         }
         
-        // Add tech panels
-        bgGraphics.fillStyle(0x333366, 0.5);
-        for (let i = 0; i < 6; i++) {
-          const x = i * 200 + 40;
-          bgGraphics.fillRoundedRect(x, 40, 90, 120, 8);
-          bgGraphics.fillRoundedRect(x, 440, 90, 120, 8);
+        // Enhanced tech panels with better design
+        bgGraphics.fillStyle(0x444499, 0.6);
+        for (let i = 0; i < 8; i++) {
+          const x = i * 175 + 50;
+          bgGraphics.fillRoundedRect(x, 50, 100, 140, 10);
+          bgGraphics.fillRoundedRect(x, 510, 100, 140, 10);
           
-          bgGraphics.fillStyle(0x4444aa, 0.3);
-          bgGraphics.fillRect(x + 10, 50, 70, 8);
-          bgGraphics.fillRect(x + 10, 450, 70, 8);
-          bgGraphics.fillStyle(0x333366, 0.5);
+          // Panel details
+          bgGraphics.fillStyle(0x5555bb, 0.4);
+          bgGraphics.fillRect(x + 15, 65, 70, 10);
+          bgGraphics.fillRect(x + 15, 525, 70, 10);
+          bgGraphics.fillStyle(0x6666cc, 0.3);
+          bgGraphics.fillRect(x + 20, 85, 60, 6);
+          bgGraphics.fillRect(x + 20, 545, 60, 6);
+          bgGraphics.fillStyle(0x444499, 0.6);
         }
         
         // Enhanced glowing elements
-        bgGraphics.fillStyle(0x00ffcc, 0.3);
-        for (let i = 0; i < 10; i++) {
-          const x = i * 120;
-          bgGraphics.fillCircle(x + 60, 120, 25);
-          bgGraphics.fillCircle(x + 60, 480, 25);
+        bgGraphics.fillStyle(0x00ffdd, 0.4);
+        for (let i = 0; i < 12; i++) {
+          const x = i * 120 + 60;
+          bgGraphics.fillCircle(x, 140, 30);
+          bgGraphics.fillCircle(x, 560, 30);
         }
         
         // Enhanced warning stripes
-        bgGraphics.fillStyle(0xffaa00, 0.7);
-        for (let x = 0; x < 1200; x += 50) {
-          bgGraphics.fillRect(x, 0, 25, 25);
-          bgGraphics.fillRect(x + 25, 575, 25, 25);
+        bgGraphics.fillStyle(0xffbb00, 0.8);
+        for (let x = 0; x < 1400; x += 60) {
+          bgGraphics.fillRect(x, 0, 30, 30);
+          bgGraphics.fillRect(x + 30, 670, 30, 30);
         }
-        bgGraphics.fillStyle(0x000000, 0.7);
-        for (let x = 25; x < 1200; x += 50) {
-          bgGraphics.fillRect(x, 0, 25, 25);
-          bgGraphics.fillRect(x - 25, 575, 25, 25);
+        bgGraphics.fillStyle(0x000000, 0.8);
+        for (let x = 30; x < 1400; x += 60) {
+          bgGraphics.fillRect(x, 0, 30, 30);
+          bgGraphics.fillRect(x - 30, 670, 30, 30);
         }
         
-        bgGraphics.generateTexture('enhanced-lab-background', 1200, 600);
+        bgGraphics.generateTexture('enhanced-lab-background', 1400, 700);
         bgGraphics.destroy();
       }
 
       create() {
-        console.log('🚀 Creating PERFECT COLLISION jetpack game scene...');
+        console.log('🚀 Creating ENHANCED UI jetpack game scene...');
         
-        this.physics.world.setBounds(0, 0, 1200, 600);
+        this.physics.world.setBounds(0, 0, 1400, 700);
 
         // Create scrolling background
         this.createScrollingBackground();
@@ -456,7 +490,7 @@ export default function QuestGamePage() {
         // Start spawning
         this.startJetpackSpawning();
 
-        console.log('✅ PERFECT COLLISION jetpack game scene created successfully!');
+        console.log('✅ ENHANCED UI jetpack game scene created successfully!');
       }
 
       createScrollingBackground() {
@@ -464,58 +498,75 @@ export default function QuestGamePage() {
           if (this.cache.video.exists('bgvideo')) {
             this.backgroundVideo = this.add.video(0, 0, 'bgvideo');
             this.backgroundVideo.setOrigin(0, 0);
-            this.backgroundVideo.setDisplaySize(1200, 600);
+            this.backgroundVideo.setDisplaySize(1400, 700);
             this.backgroundVideo.play(true);
             console.log('Using custom bg.mp4 background');
             
-            this.backgroundOverlay = this.add.tileSprite(0, 0, 1200, 600, 'enhanced-lab-background');
+            this.backgroundOverlay = this.add.tileSprite(0, 0, 1400, 700, 'enhanced-lab-background');
             this.backgroundOverlay.setOrigin(0, 0);
             this.backgroundOverlay.setAlpha(0.4);
           } else {
-            this.background = this.add.tileSprite(0, 0, 1200, 600, 'enhanced-lab-background');
+            this.background = this.add.tileSprite(0, 0, 1400, 700, 'enhanced-lab-background');
             this.background.setOrigin(0, 0);
             console.log('Using fallback enhanced lab background');
           }
         } catch (error) {
           console.warn('Background creation error, using fallback');
-          this.background = this.add.tileSprite(0, 0, 1200, 600, 'enhanced-lab-background');
+          this.background = this.add.tileSprite(0, 0, 1400, 700, 'enhanced-lab-background');
           this.background.setOrigin(0, 0);
         }
       }
 
       createEnhancedJetpackPlayer() {
-        this.player = this.physics.add.sprite(120, 300, 'enhanced-jetpack-player');
+        this.player = this.physics.add.sprite(140, 350, 'enhanced-jetpack-player');
         this.player.setCollideWorldBounds(true);
         this.player.setBounce(0.1);
-        this.player.setScale(1.0);
-        this.player.setSize(30, 45);
+        this.player.setScale(1.1);
+        this.player.setSize(35, 55);
         this.player.setGravityY(0);
         this.player.setTint(0xffffff);
       }
 
       createEnhancedJetpackUI() {
-        // Enhanced Lives display
-        this.livesText = this.add.text(20, 20, `❤️ Lives: ${this.lives}`, {
-          fontSize: '22px',
-          fill: '#ff4444',
+        // Enhanced Lives display with better styling
+        this.livesText = this.add.text(25, 25, `❤️ Lives: ${this.lives}`, {
+          fontSize: '26px',
+          fill: '#ff5555',
           stroke: '#ffffff',
-          strokeThickness: 2,
+          strokeThickness: 3,
           fontWeight: 'bold',
           shadow: {
-            offsetX: 2,
-            offsetY: 2,
+            offsetX: 3,
+            offsetY: 3,
             color: '#000000',
-            blur: 2,
+            blur: 3,
             stroke: true,
             fill: true
           }
         });
 
         // Enhanced Score display
-        this.scoreText = this.add.text(20, 50, `💰 Score: ${this.score}`, {
-          fontSize: '22px',
-          fill: '#44ff44',
+        this.scoreText = this.add.text(25, 60, `💰 Score: ${this.score}`, {
+          fontSize: '26px',
+          fill: '#55ff55',
           stroke: '#000000',
+          strokeThickness: 3,
+          fontWeight: 'bold',
+          shadow: {
+            offsetX: 3,
+            offsetY: 3,
+            color: '#000000',
+            blur: 3,
+            stroke: true,
+            fill: true
+          }
+        });
+
+        // Enhanced Distance display
+        this.distanceText = this.add.text(25, 95, `🚀 Distance: ${this.distance}m`, {
+          fontSize: '22px',
+          fill: '#55aaff',
+          stroke: '#ffffff',
           strokeThickness: 2,
           fontWeight: 'bold',
           shadow: {
@@ -523,23 +574,6 @@ export default function QuestGamePage() {
             offsetY: 2,
             color: '#000000',
             blur: 2,
-            stroke: true,
-            fill: true
-          }
-        });
-
-        // Enhanced Distance display
-        this.distanceText = this.add.text(20, 80, `🚀 Distance: ${this.distance}m`, {
-          fontSize: '20px',
-          fill: '#44aaff',
-          stroke: '#ffffff',
-          strokeThickness: 1,
-          fontWeight: 'bold',
-          shadow: {
-            offsetX: 1,
-            offsetY: 1,
-            color: '#000000',
-            blur: 1,
             stroke: true,
             fill: true
           }
@@ -547,29 +581,10 @@ export default function QuestGamePage() {
 
         // Enhanced Progress indicator
         const totalQuestions = this.questions.length;
-        this.progressText = this.add.text(20, 110, `📝 Question: ${Math.min(this.questionIndex + 1, totalQuestions)}/${totalQuestions}`, {
-          fontSize: '18px',
-          fill: '#ffaa44',
+        this.progressText = this.add.text(25, 130, `📝 Question: ${Math.min(this.questionIndex + 1, totalQuestions)}/${totalQuestions}`, {
+          fontSize: '20px',
+          fill: '#ffaa55',
           stroke: '#ffffff',
-          strokeThickness: 1,
-          fontWeight: 'bold',
-          shadow: {
-            offsetX: 1,
-            offsetY: 1,
-            color: '#000000',
-            blur: 1,
-            stroke: true,
-            fill: true
-          }
-        });
-
-        this.createEnhancedJetpackFuelBar();
-
-        // Enhanced instructions
-        this.add.text(1180, 20, '🚀 HOLD SPACE for JETPACK BOOST!', {
-          fontSize: '18px',
-          fill: '#ffff44',
-          stroke: '#000000',
           strokeThickness: 2,
           fontWeight: 'bold',
           shadow: {
@@ -580,24 +595,69 @@ export default function QuestGamePage() {
             stroke: true,
             fill: true
           }
+        });
+
+        this.createEnhancedJetpackFuelBar();
+
+        // Enhanced instructions with better positioning
+        this.add.text(1375, 25, '🚀 HOLD SPACE for JETPACK BOOST!', {
+          fontSize: '20px',
+          fill: '#ffff55',
+          stroke: '#000000',
+          strokeThickness: 3,
+          fontWeight: 'bold',
+          shadow: {
+            offsetX: 3,
+            offsetY: 3,
+            color: '#000000',
+            blur: 3,
+            stroke: true,
+            fill: true
+          }
         }).setOrigin(1, 0);
+
+        // Additional UI enhancement - Mini radar/compass
+        this.miniRadar = this.add.graphics();
+        this.miniRadar.fillStyle(0x333333, 0.8);
+        this.miniRadar.fillCircle(1300, 120, 30);
+        this.miniRadar.lineStyle(2, 0x00ff44, 1);
+        this.miniRadar.strokeCircle(1300, 120, 30);
+        this.miniRadar.fillStyle(0x00ff44);
+        this.miniRadar.fillCircle(1300, 120, 3);
       }
 
       createEnhancedJetpackFuelBar() {
-        this.fuelBarBg = this.add.rectangle(1050, 80, 140, 25, 0x333333);
-        this.fuelBarBg.setStrokeStyle(3, 0xffffff);
+        // Enhanced fuel bar with better design
+        this.fuelBarBg = this.add.rectangle(1200, 90, 160, 30, 0x444444);
+        this.fuelBarBg.setStrokeStyle(4, 0xffffff);
         
-        this.fuelBarGlow = this.add.rectangle(1050, 80, 145, 30, 0x44ff44, 0.2);
+        this.fuelBarGlow = this.add.rectangle(1200, 90, 170, 40, 0x55ff55, 0.3);
         
-        this.fuelBar = this.add.rectangle(1050, 80, 135, 20, 0x00ff44);
+        this.fuelBar = this.add.rectangle(1200, 90, 150, 25, 0x00ff55);
         
-        this.fuelText = this.add.text(1050, 110, 'JETPACK FUEL', {
-          fontSize: '14px',
+        // Enhanced fuel text
+        this.fuelText = this.add.text(1200, 125, 'JETPACK FUEL', {
+          fontSize: '16px',
           fill: '#ffffff',
           fontWeight: 'bold',
           stroke: '#000000',
-          strokeThickness: 1
+          strokeThickness: 2,
+          shadow: {
+            offsetX: 1,
+            offsetY: 1,
+            color: '#000000',
+            blur: 1,
+            stroke: true,
+            fill: true
+          }
         }).setOrigin(0.5, 0);
+
+        // Fuel percentage text
+        this.fuelPercentText = this.add.text(1200, 90, '100%', {
+          fontSize: '14px',
+          fill: '#000000',
+          fontWeight: 'bold'
+        }).setOrigin(0.5);
       }
 
       setupJetpackInput() {
@@ -615,12 +675,12 @@ export default function QuestGamePage() {
       }
 
       createTouchFeedback(x, y) {
-        const ripple = this.add.circle(x, y, 8, 0x44ff44, 0.8);
+        const ripple = this.add.circle(x, y, 10, 0x55ff55, 0.9);
         this.tweens.add({
           targets: ripple,
-          radius: 40,
+          radius: 50,
           alpha: 0,
-          duration: 400,
+          duration: 500,
           ease: 'Power2',
           onComplete: () => ripple.destroy()
         });
@@ -648,23 +708,23 @@ export default function QuestGamePage() {
         const obstacleTypes = ['enhanced-laser-obstacle', 'enhanced-missile-obstacle', 'enhanced-electric-obstacle'];
         const randomType = window.Phaser.Math.RND.pick(obstacleTypes);
         let obstacle;
-        let yPos = window.Phaser.Math.Between(120, 480);
+        let yPos = window.Phaser.Math.Between(140, 560);
 
         if (randomType === 'enhanced-laser-obstacle') {
-          yPos = window.Phaser.Math.Between(80, 250);
-          obstacle = this.obstacles.create(1250, yPos, randomType);
-          obstacle.setSize(15, 320);
+          yPos = window.Phaser.Math.Between(100, 300);
+          obstacle = this.obstacles.create(1450, yPos, randomType);
+          obstacle.setSize(18, 370);
         } else if (randomType === 'enhanced-missile-obstacle') {
-          obstacle = this.obstacles.create(1250, yPos, randomType);
-          obstacle.setSize(45, 15);
+          obstacle = this.obstacles.create(1450, yPos, randomType);
+          obstacle.setSize(55, 18);
           obstacle.setAngularVelocity(150);
         } else {
-          obstacle = this.obstacles.create(1250, yPos, randomType);
-          obstacle.setSize(35, 100);
+          obstacle = this.obstacles.create(1450, yPos, randomType);
+          obstacle.setSize(45, 120);
         }
 
         obstacle.setVelocityX(-this.scrollSpeed);
-        obstacle.setTint(0xff8888);
+        obstacle.setTint(0xff9999);
 
         if (randomType === 'enhanced-missile-obstacle') {
           obstacle.setVelocityY(window.Phaser.Math.Between(-80, 80));
@@ -674,25 +734,25 @@ export default function QuestGamePage() {
       spawnEnhancedCoin() {
         if (this.gameState !== 'PLAYING') return;
 
-        const x = window.Phaser.Math.Between(1250, 1400);
-        const y = window.Phaser.Math.Between(120, 480);
+        const x = window.Phaser.Math.Between(1450, 1600);
+        const y = window.Phaser.Math.Between(140, 560);
         const coin = this.coins.create(x, y, 'enhanced-coin');
         coin.setVelocityX(-this.scrollSpeed);
-        coin.setScale(1.0);
-        coin.setCircle(10);
+        coin.setScale(1.1);
+        coin.setCircle(12);
 
         this.tweens.add({
           targets: coin,
-          scaleX: 1.3,
-          scaleY: 1.3,
+          scaleX: 1.4,
+          scaleY: 1.4,
           rotation: Math.PI * 2,
-          duration: 800,
+          duration: 900,
           yoyo: true,
           repeat: -1,
           ease: 'Sine.easeInOut'
         });
 
-        coin.setTint(0xffffaa);
+        coin.setTint(0xffffbb);
       }
 
       update() {
@@ -704,7 +764,7 @@ export default function QuestGamePage() {
             this.createEnhancedJetpackParticles();
             
             this.player.rotation = -0.25;
-            this.player.setTint(0xaaddff);
+            this.player.setTint(0xbbddff);
           }
         } else {
           this.player.setVelocityY(this.player.body.velocity.y + 18);
@@ -730,7 +790,7 @@ export default function QuestGamePage() {
         this.updateEnhancedJetpackUI();
         this.updateParticles();
 
-        // 🔄 UPDATE MOVING ANSWERS - Move them slowly left
+        // 🔄 UPDATE MOVING ANSWERS - Move them 1.08x faster
         if (this.gameState === 'QUESTION_ACTIVE') {
           this.updateMovingAnswers();
         }
@@ -769,8 +829,8 @@ export default function QuestGamePage() {
           console.log('✅ CORRECT ANSWER!');
           
           // 🟢 CORRECT ANSWER - GREEN HIGHLIGHT
-          answerObj.bg.setFillStyle(0x00ff44); // Bright Green
-          answerObj.glow.setFillStyle(0x44ff88); // Light Green Glow
+          answerObj.bg.setFillStyle(0x00ff55); // Bright Green
+          answerObj.glow.setFillStyle(0x55ff88); // Light Green Glow
           
           // SUCCESS EXPLOSION EFFECT
           this.createSuccessExplosion(answerObj.bg.x, answerObj.bg.y);
@@ -785,19 +845,19 @@ export default function QuestGamePage() {
           
           // Show +25 score popup
           const scorePopup = this.add.text(answerObj.bg.x, answerObj.bg.y - 60, '+25', {
-            fontSize: '40px',
-            fill: '#00ff44',
+            fontSize: '44px',
+            fill: '#00ff55',
             fontWeight: 'bold',
             stroke: '#ffffff',
-            strokeThickness: 3
+            strokeThickness: 4
           }).setOrigin(0.5);
           
           this.tweens.add({
             targets: scorePopup,
-            y: scorePopup.y - 50,
+            y: scorePopup.y - 60,
             alpha: 0,
-            scale: 1.5,
-            duration: 1500,
+            scale: 1.6,
+            duration: 1600,
             ease: 'Power2',
             onComplete: () => scorePopup.destroy()
           });
@@ -809,20 +869,20 @@ export default function QuestGamePage() {
           console.log('❌ WRONG ANSWER!');
           
           // 🔴 WRONG ANSWER - RED HIGHLIGHT
-          answerObj.bg.setFillStyle(0xff2222); // Bright Red
-          answerObj.glow.setFillStyle(0xff6666); // Light Red Glow
+          answerObj.bg.setFillStyle(0xff3333); // Bright Red
+          answerObj.glow.setFillStyle(0xff7777); // Light Red Glow
           
           // 🟢 SHOW CORRECT ANSWER IN GREEN
           this.showCorrectAnswer(question.correctAnswer);
           
           // CAMERA SHAKE EFFECT
-          this.cameras.main.shake(400, 0.02);
+          this.cameras.main.shake(500, 0.025);
           
           // WRONG ANSWER SHAKE EFFECT
           this.tweens.add({
             targets: [answerObj.bg, answerObj.glow, answerObj.label, answerObj.text],
-            x: '+=20',
-            duration: 80,
+            x: '+=25',
+            duration: 90,
             yoyo: true,
             repeat: 6,
             ease: 'Power2'
@@ -838,19 +898,19 @@ export default function QuestGamePage() {
           this.createDamageFlash();
           
           // Life lost text
-          const damageText = this.add.text(this.player.x, this.player.y - 50, '-1 LIFE', {
-            fontSize: '28px',
+          const damageText = this.add.text(this.player.x, this.player.y - 60, '-1 LIFE', {
+            fontSize: '32px',
             fill: '#ff0000',
             fontWeight: 'bold',
             stroke: '#ffffff',
-            strokeThickness: 3
+            strokeThickness: 4
           }).setOrigin(0.5);
           
           this.tweens.add({
             targets: damageText,
-            y: damageText.y - 60,
+            y: damageText.y - 70,
             alpha: 0,
-            duration: 1500,
+            duration: 1600,
             onComplete: () => damageText.destroy()
           });
           
@@ -874,23 +934,23 @@ export default function QuestGamePage() {
             // Highlight correct answer with green pulsing effect
             this.tweens.add({
               targets: [answerObj.bg, answerObj.glow],
-              alpha: 0.8,
-              duration: 300,
+              alpha: 0.9,
+              duration: 350,
               yoyo: true,
               repeat: 3,
               onStart: () => {
-                answerObj.bg.setFillStyle(0x00aa00); // Green
-                answerObj.glow.setFillStyle(0x44aa44); // Light Green
+                answerObj.bg.setFillStyle(0x00bb00); // Green
+                answerObj.glow.setFillStyle(0x55bb55); // Light Green
               }
             });
 
             // Add checkmark to correct answer
-            const checkmark = this.add.text(answerObj.bg.x + 150, answerObj.bg.y, '✓', {
-              fontSize: '40px',
+            const checkmark = this.add.text(answerObj.bg.x + 170, answerObj.bg.y, '✓', {
+              fontSize: '45px',
               fill: '#ffffff',
               fontWeight: 'bold',
-              stroke: '#00aa00',
-              strokeThickness: 3
+              stroke: '#00bb00',
+              strokeThickness: 4
             }).setOrigin(0.5);
 
             this.time.delayedCall(2500, () => {
@@ -901,12 +961,12 @@ export default function QuestGamePage() {
       }
 
       createEnhancedJetpackParticles() {
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 6; i++) {
           const particle = this.add.circle(
-            this.player.x - 20 + window.Phaser.Math.Between(-8, 8),
-            this.player.y + 25,
-            window.Phaser.Math.Between(3, 6),
-            window.Phaser.Math.RND.pick([0xff6600, 0xff4400, 0xffaa00, 0xff8800]),
+            this.player.x - 25 + window.Phaser.Math.Between(-10, 10),
+            this.player.y + 30,
+            window.Phaser.Math.Between(4, 8),
+            window.Phaser.Math.RND.pick([0xff7700, 0xff5500, 0xffbb00, 0xff9900]),
             0.9
           );
 
@@ -914,11 +974,11 @@ export default function QuestGamePage() {
 
           this.tweens.add({
             targets: particle,
-            x: particle.x - window.Phaser.Math.Between(30, 60),
-            y: particle.y + window.Phaser.Math.Between(15, 40),
+            x: particle.x - window.Phaser.Math.Between(35, 70),
+            y: particle.y + window.Phaser.Math.Between(20, 50),
             alpha: 0,
             scale: 0.1,
-            duration: 500,
+            duration: 550,
             ease: 'Power2',
             onComplete: () => {
               if (particle.active) {
@@ -933,35 +993,41 @@ export default function QuestGamePage() {
       updateEnhancedFuelBar() {
         const fuelPercent = this.jetpackFuel / 100;
         this.fuelBar.scaleX = fuelPercent;
+        
+        // Update percentage text
+        this.fuelPercentText.setText(`${Math.round(this.jetpackFuel)}%`);
 
         if (fuelPercent > 0.6) {
-          this.fuelBar.setFillStyle(0x00ff44);
-          this.fuelBarGlow.setFillStyle(0x44ff44);
+          this.fuelBar.setFillStyle(0x00ff55);
+          this.fuelBarGlow.setFillStyle(0x55ff55);
+          this.fuelPercentText.setStyle({ fill: '#000000' });
         } else if (fuelPercent > 0.3) {
-          this.fuelBar.setFillStyle(0xffaa00);
-          this.fuelBarGlow.setFillStyle(0xffcc44);
+          this.fuelBar.setFillStyle(0xffbb00);
+          this.fuelBarGlow.setFillStyle(0xffdd55);
+          this.fuelPercentText.setStyle({ fill: '#000000' });
         } else {
-          this.fuelBar.setFillStyle(0xff4444);
-          this.fuelBarGlow.setFillStyle(0xff6666);
+          this.fuelBar.setFillStyle(0xff5555);
+          this.fuelBarGlow.setFillStyle(0xff7777);
+          this.fuelPercentText.setStyle({ fill: '#ffffff' });
           
           if (fuelPercent < 0.2) {
-            this.fuelBarGlow.setAlpha(0.5 + Math.sin(this.time.now * 0.01) * 0.3);
+            this.fuelBarGlow.setAlpha(0.6 + Math.sin(this.time.now * 0.012) * 0.4);
           }
         }
       }
 
       scrollBackground() {
         if (this.background) {
-          this.background.tilePositionX += this.scrollSpeed * 0.015;
+          this.background.tilePositionX += this.scrollSpeed * 0.018;
         }
         if (this.backgroundOverlay) {
-          this.backgroundOverlay.tilePositionX += this.scrollSpeed * 0.008;
+          this.backgroundOverlay.tilePositionX += this.scrollSpeed * 0.010;
         }
       }
 
       cleanupObjects() {
         this.obstacles.children.entries.forEach(obstacle => {
-          if (obstacle.x < -150) {
+          if (obstacle.x < -180) {
             if (this.gameState === 'PLAYING') {
               this.obstaclesPassed++;
             }
@@ -970,7 +1036,7 @@ export default function QuestGamePage() {
         });
 
         this.coins.children.entries.forEach(coin => {
-          if (coin.x < -80) {
+          if (coin.x < -100) {
             coin.destroy();
           }
         });
@@ -988,19 +1054,19 @@ export default function QuestGamePage() {
         this.score += 8;
 
         const coinText = this.add.text(coin.x, coin.y, '+8', {
-          fontSize: '20px',
+          fontSize: '22px',
           fill: '#ffdd00',
           fontWeight: 'bold',
           stroke: '#000000',
-          strokeThickness: 2
+          strokeThickness: 3
         });
 
         this.tweens.add({
           targets: coinText,
-          y: coinText.y - 40,
+          y: coinText.y - 50,
           alpha: 0,
-          scale: 1.5,
-          duration: 1000,
+          scale: 1.6,
+          duration: 1100,
           ease: 'Power2',
           onComplete: () => coinText.destroy()
         });
@@ -1009,16 +1075,16 @@ export default function QuestGamePage() {
       }
 
       createCoinSparkles(x, y) {
-        const colors = [0xffff00, 0xffdd00, 0xffaa00];
-        for (let i = 0; i < 6; i++) {
-          const spark = this.add.circle(x, y, 3, colors[i % colors.length]);
-          const angle = (i / 6) * Math.PI * 2;
+        const colors = [0xffff00, 0xffdd00, 0xffbb00];
+        for (let i = 0; i < 8; i++) {
+          const spark = this.add.circle(x, y, 4, colors[i % colors.length]);
+          const angle = (i / 8) * Math.PI * 2;
           this.tweens.add({
             targets: spark,
-            x: x + Math.cos(angle) * 30,
-            y: y + Math.sin(angle) * 30,
+            x: x + Math.cos(angle) * 35,
+            y: y + Math.sin(angle) * 35,
             alpha: 0,
-            duration: 600,
+            duration: 700,
             onComplete: () => spark.destroy()
           });
         }
@@ -1062,8 +1128,8 @@ export default function QuestGamePage() {
           obstacle.setVelocity(0, 0);
           this.tweens.add({
             targets: obstacle,
-            alpha: 0.2,
-            duration: 600
+            alpha: 0.25,
+            duration: 700
           });
         });
 
@@ -1071,37 +1137,37 @@ export default function QuestGamePage() {
           coin.setVelocity(0, 0);
           this.tweens.add({
             targets: coin,
-            alpha: 0.3,
-            duration: 600
+            alpha: 0.35,
+            duration: 700
           });
         });
 
         this.showQuestionFromTop(question);
 
         this.time.delayedCall(1200, () => {
-          this.showPerfectCollisionAnswerZones(question);
+          this.showEnhancedCollisionAnswerZones(question);
         });
       }
 
       showQuestionFromTop(question) {
-        const questionBg = this.add.rectangle(600, -60, 1000, 100, 0x000066, 0.95);
-        questionBg.setStrokeStyle(4, 0x4488ff);
+        const questionBg = this.add.rectangle(700, -70, 1100, 120, 0x000077, 0.96);
+        questionBg.setStrokeStyle(5, 0x5588ff);
 
-        const questionGlow = this.add.rectangle(600, -60, 1010, 110, 0x4488ff, 0.4);
+        const questionGlow = this.add.rectangle(700, -70, 1120, 140, 0x5588ff, 0.5);
 
-        this.questionText = this.add.text(600, -60, question.question, {
-          fontSize: '26px',
+        this.questionText = this.add.text(700, -70, question.question, {
+          fontSize: '28px',
           fill: '#ffffff',
           align: 'center',
           fontWeight: 'bold',
-          wordWrap: { width: 950 },
+          wordWrap: { width: 1050 },
           stroke: '#000000',
-          strokeThickness: 2,
+          strokeThickness: 3,
           shadow: {
-            offsetX: 2,
-            offsetY: 2,
-            color: '#000044',
-            blur: 3,
+            offsetX: 3,
+            offsetY: 3,
+            color: '#000055',
+            blur: 4,
             stroke: true,
             fill: true
           }
@@ -1109,17 +1175,17 @@ export default function QuestGamePage() {
 
         this.tweens.add({
           targets: [questionBg, questionGlow, this.questionText],
-          y: 80,
-          duration: 800,
+          y: 90,
+          duration: 900,
           ease: 'Back.easeOut'
         });
 
         this.currentQuestionElements = [questionBg, questionGlow, this.questionText];
       }
 
-      // 🔥 MOVING COLLISION ANSWER ZONES - Slowly moving left for jetpack collision
-      showPerfectCollisionAnswerZones(question) {
-        console.log('🎯 Creating MOVING collision answer zones...');
+      // 🔥 ENHANCED MOVING COLLISION ANSWER ZONES - 1.08x FASTER SPEED
+      showEnhancedCollisionAnswerZones(question) {
+        console.log('🎯 Creating ENHANCED MOVING collision answer zones with 1.08x speed...');
         
         this.clearAnswerObjects();
         
@@ -1129,19 +1195,37 @@ export default function QuestGamePage() {
         this.answerObjects = [];
         
         for (let i = 0; i < question.answers.length; i++) {
-          const yPos = 200 + (i * 120);
-          const startX = 1400; // Start from right side
+          const yPos = 220 + (i * 140); // Increased spacing for bigger screen
+          const startX = 1600; // Start from further right for bigger screen
           
-          // Visual elements
-          const answerBg = this.add.rectangle(startX, yPos, 350, 90, answerColors[i], 0.9);
-          answerBg.setStrokeStyle(4, 0xffffff);
+          // Enhanced visual elements with better size
+          const answerBg = this.add.rectangle(startX, yPos, 400, 110, answerColors[i], 0.92);
+          answerBg.setStrokeStyle(5, 0xffffff);
           
-          const answerGlow = this.add.rectangle(startX, yPos, 360, 100, answerColors[i], 0.3);
+          const answerGlow = this.add.rectangle(startX, yPos, 420, 130, answerColors[i], 0.35);
           
-          const answerLabel = this.add.text(startX - 140, yPos, answerLabels[i], {
-            fontSize: '32px',
+          const answerLabel = this.add.text(startX - 160, yPos, answerLabels[i], {
+            fontSize: '36px',
             fill: '#ffffff',
             fontWeight: 'bold',
+            stroke: '#000000',
+            strokeThickness: 4,
+            shadow: {
+              offsetX: 3,
+              offsetY: 3,
+              color: '#000000',
+              blur: 3,
+              stroke: true,
+              fill: true
+            }
+          }).setOrigin(0.5);
+          
+          const answerText = this.add.text(startX, yPos, question.answers[i], {
+            fontSize: '24px',
+            fill: '#ffffff',
+            align: 'center',
+            fontWeight: 'bold',
+            wordWrap: { width: 350 },
             stroke: '#000000',
             strokeThickness: 3,
             shadow: {
@@ -1149,24 +1233,6 @@ export default function QuestGamePage() {
               offsetY: 2,
               color: '#000000',
               blur: 2,
-              stroke: true,
-              fill: true
-            }
-          }).setOrigin(0.5);
-          
-          const answerText = this.add.text(startX, yPos, question.answers[i], {
-            fontSize: '22px',
-            fill: '#ffffff',
-            align: 'center',
-            fontWeight: 'bold',
-            wordWrap: { width: 300 },
-            stroke: '#000000',
-            strokeThickness: 2,
-            shadow: {
-              offsetX: 1,
-              offsetY: 1,
-              color: '#000000',
-              blur: 1,
               stroke: true,
               fill: true
             }
@@ -1184,8 +1250,8 @@ export default function QuestGamePage() {
             // Current position for movement
             currentX: startX,
             currentY: yPos,
-            // Movement properties
-            moveSpeed: -30, // Move left slowly (30 pixels per second)
+            // 🚀 ENHANCED MOVEMENT PROPERTIES - 1.08x FASTER
+            moveSpeed: -32.4, // Original was -30, now -30 * 1.08 = -32.4
             isMoving: false
           };
           
@@ -1197,32 +1263,32 @@ export default function QuestGamePage() {
           answerLabel.setAlpha(0);
           answerText.setAlpha(0);
           
-          // Fade in animation
+          // Enhanced fade in animation
           this.tweens.add({
             targets: [answerBg, answerGlow, answerLabel, answerText],
             alpha: 1,
-            duration: 500,
-            delay: i * 150,
+            duration: 600,
+            delay: i * 180,
             ease: 'Power2.easeOut',
             onComplete: () => {
               // Start moving after fade in
               answerObj.isMoving = true;
-              console.log(`📍 Answer zone ${i} now moving left at ${answerObj.moveSpeed} pixels/second`);
+              console.log(`📍 Answer zone ${i} now moving left at ${answerObj.moveSpeed} pixels/second (1.08x faster)`);
             }
           });
           
-          console.log(`🎯 Created moving answer zone ${i} starting at x=${startX} for: "${question.answers[i]}"`);
+          console.log(`🎯 Created enhanced moving answer zone ${i} starting at x=${startX} for: "${question.answers[i]}"`);
         }
         
         // Show instruction
-        this.time.delayedCall(800, () => {
+        this.time.delayedCall(900, () => {
           this.showQuestionInstruction();
         });
         
-        console.log('✅ All answer zones ready for MOVING collision!');
+        console.log('✅ All enhanced answer zones ready for FASTER collision!');
       }
 
-      // 🔄 UPDATE MOVING ANSWER POSITIONS - Called every frame
+      // 🔄 UPDATE MOVING ANSWER POSITIONS - Called every frame with 1.08x speed
       updateMovingAnswers() {
         if (this.gameState !== 'QUESTION_ACTIVE' || !this.answerObjects) return;
         
@@ -1233,24 +1299,24 @@ export default function QuestGamePage() {
           
           if (!answerObj.isMoving || answerObj.answered) continue;
           
-          // Update position
+          // Update position with 1.08x speed
           answerObj.currentX += answerObj.moveSpeed * deltaTime;
           
           // Update all visual elements
           answerObj.bg.x = answerObj.currentX;
           answerObj.glow.x = answerObj.currentX;
-          answerObj.label.x = answerObj.currentX - 140;
+          answerObj.label.x = answerObj.currentX - 160;
           answerObj.text.x = answerObj.currentX;
           
           // Remove if moved too far left (optional cleanup)
-          if (answerObj.currentX < -200) {
+          if (answerObj.currentX < -250) {
             answerObj.isMoving = false;
             console.log(`🗑️ Answer zone ${i} moved off screen`);
           }
         }
       }
 
-      // 🎯 ENHANCED COLLISION DETECTION for moving answers
+      // 🎯 ENHANCED COLLISION DETECTION for faster moving answers
       checkAnswerCollisions() {
         if (this.gameState !== 'QUESTION_ACTIVE' || !this.player || !this.answerObjects) return;
         
@@ -1263,10 +1329,10 @@ export default function QuestGamePage() {
           
           // Calculate current bounds based on current position
           const bounds = {
-            x: answerObj.currentX - 175, // left edge
-            y: answerObj.currentY - 45,  // top edge  
-            width: 350,                  // width
-            height: 90                   // height
+            x: answerObj.currentX - 200, // left edge (adjusted for larger size)
+            y: answerObj.currentY - 55,  // top edge  
+            width: 400,                  // width (increased)
+            height: 110                  // height (increased)
           };
           
           // Manual collision detection using bounding boxes
@@ -1275,7 +1341,7 @@ export default function QuestGamePage() {
               playerBounds.y < bounds.y + bounds.height &&
               playerBounds.y + playerBounds.height > bounds.y) {
             
-            console.log(`🎯 COLLISION! Player hit moving answer ${i}: "${answerObj.answerText}"`);
+            console.log(`🎯 COLLISION! Player hit enhanced moving answer ${i}: "${answerObj.answerText}"`);
             console.log(`Player bounds: x=${Math.round(playerBounds.x)}, y=${Math.round(playerBounds.y)}, w=${Math.round(playerBounds.width)}, h=${Math.round(playerBounds.height)}`);
             console.log(`Answer bounds: x=${Math.round(bounds.x)}, y=${Math.round(bounds.y)}, w=${bounds.width}, h=${bounds.height}`);
             
@@ -1286,18 +1352,18 @@ export default function QuestGamePage() {
       }
 
       showQuestionInstruction() {
-        const instruction = this.add.text(600, 520, '🚀 Fly your jetpack into the correct answer zone!', {
-          fontSize: '20px',
-          fill: '#ffff44',
+        const instruction = this.add.text(700, 580, '🚀 Fly your jetpack into the correct answer zone!', {
+          fontSize: '22px',
+          fill: '#ffff55',
           align: 'center',
           fontWeight: 'bold',
           stroke: '#000000',
-          strokeThickness: 3,
+          strokeThickness: 4,
           shadow: {
-            offsetX: 2,
-            offsetY: 2,
+            offsetX: 3,
+            offsetY: 3,
             color: '#000000',
-            blur: 3,
+            blur: 4,
             stroke: true,
             fill: true
           }
@@ -1305,9 +1371,9 @@ export default function QuestGamePage() {
 
         this.tweens.add({
           targets: instruction,
-          alpha: 0.7,
-          scale: 0.95,
-          duration: 1200,
+          alpha: 0.8,
+          scale: 0.96,
+          duration: 1300,
           yoyo: true,
           repeat: -1,
           ease: 'Sine.easeInOut'
@@ -1317,18 +1383,18 @@ export default function QuestGamePage() {
       }
 
       createSuccessExplosion(x, y) {
-        const colors = [0x00ff44, 0x44ff44, 0x88ff88, 0xaaffaa, 0xffffff];
-        for (let i = 0; i < 15; i++) {
-          const particle = this.add.circle(x, y, window.Phaser.Math.Between(4, 8), colors[i % colors.length]);
-          const angle = (i / 15) * Math.PI * 2;
-          const distance = 80 + Math.random() * 50;
+        const colors = [0x00ff55, 0x55ff55, 0x99ff99, 0xbbffbb, 0xffffff];
+        for (let i = 0; i < 18; i++) {
+          const particle = this.add.circle(x, y, window.Phaser.Math.Between(5, 10), colors[i % colors.length]);
+          const angle = (i / 18) * Math.PI * 2;
+          const distance = 90 + Math.random() * 60;
           this.tweens.add({
             targets: particle,
             x: x + Math.cos(angle) * distance,
             y: y + Math.sin(angle) * distance,
             alpha: 0,
             scale: 0.2,
-            duration: 1200,
+            duration: 1300,
             ease: 'Power2',
             onComplete: () => particle.destroy()
           });
@@ -1336,38 +1402,38 @@ export default function QuestGamePage() {
       }
 
       createSuccessFlash() {
-        const flash = this.add.rectangle(600, 300, 1200, 600, 0x00ff44, 0.3);
+        const flash = this.add.rectangle(700, 350, 1400, 700, 0x00ff55, 0.35);
         flash.setDepth(1000);
         this.tweens.add({
           targets: flash,
           alpha: 0,
-          duration: 400,
+          duration: 450,
           onComplete: () => flash.destroy()
         });
       }
 
       createDamageFlash() {
-        const flash = this.add.rectangle(600, 300, 1200, 600, 0xff0000, 0.4);
+        const flash = this.add.rectangle(700, 350, 1400, 700, 0xff0000, 0.45);
         flash.setDepth(1000);
         this.tweens.add({
           targets: flash,
           alpha: 0,
-          duration: 500,
+          duration: 550,
           onComplete: () => flash.destroy()
         });
       }
 
       hideEnhancedQuestion() {
-        console.log('🔄 Hiding question UI');
+        console.log('🔄 Hiding enhanced question UI');
 
         if (this.currentQuestionElements && this.currentQuestionElements.length > 0) {
           this.currentQuestionElements.forEach(element => {
             if (element && element.active) {
               this.tweens.add({
                 targets: element,
-                y: -150,
+                y: -180,
                 alpha: 0,
-                duration: 600,
+                duration: 700,
                 onComplete: () => {
                   if (element && element.active) {
                     element.destroy();
@@ -1384,7 +1450,7 @@ export default function QuestGamePage() {
           this.tweens.add({
             targets: this.currentInstructionText,
             alpha: 0,
-            duration: 400,
+            duration: 450,
             onComplete: () => {
               if (this.currentInstructionText && this.currentInstructionText.active) {
                 this.currentInstructionText.destroy();
@@ -1400,12 +1466,12 @@ export default function QuestGamePage() {
         this.clearAnswerObjects();
 
         if (this.questionIndex >= this.questions.length) {
-          this.time.delayedCall(800, () => this.showResults());
+          this.time.delayedCall(900, () => this.showResults());
           return;
         }
 
-        this.time.delayedCall(1000, () => {
-          console.log('🚀 Resuming game after question');
+        this.time.delayedCall(1100, () => {
+          console.log('🚀 Resuming enhanced game after question');
           this.gameState = 'PLAYING';
           this.obstacleTimer.paused = false;
           this.coinTimer.paused = false;
@@ -1415,7 +1481,7 @@ export default function QuestGamePage() {
             this.tweens.add({
               targets: obstacle,
               alpha: 1,
-              duration: 500
+              duration: 550
             });
           });
 
@@ -1424,14 +1490,14 @@ export default function QuestGamePage() {
             this.tweens.add({
               targets: coin,
               alpha: 1,
-              duration: 500
+              duration: 550
             });
           });
         });
       }
 
       clearAnswerObjects() {
-        console.log('🧹 Clearing answer objects');
+        console.log('🧹 Clearing enhanced answer objects');
         
         // 🔧 FIX: Safely destroy visual elements with existence checks
         if (this.answerObjects && this.answerObjects.length > 0) {
@@ -1452,7 +1518,7 @@ export default function QuestGamePage() {
         console.log('💥 Player hit obstacle');
         
         obstacle.destroy();
-        this.cameras.main.shake(400, 0.04);
+        this.cameras.main.shake(450, 0.045);
         
         this.lives--;
         this.wrongAnswers++;
@@ -1464,7 +1530,7 @@ export default function QuestGamePage() {
         this.tweens.add({
           targets: this.player,
           alpha: 0.1,
-          duration: 150,
+          duration: 160,
           yoyo: true,
           repeat: 5,
           onComplete: () => {
@@ -1475,17 +1541,17 @@ export default function QuestGamePage() {
 
         this.createHitExplosion(player.x, player.y);
 
-        const damageText = this.add.text(this.player.x, this.player.y - 50, '-1 LIFE', {
-          fontSize: '28px',
+        const damageText = this.add.text(this.player.x, this.player.y - 60, '-1 LIFE', {
+          fontSize: '32px',
           fill: '#ff0000',
           fontWeight: 'bold',
           stroke: '#ffffff',
-          strokeThickness: 3,
+          strokeThickness: 4,
           shadow: {
-            offsetX: 3,
-            offsetY: 3,
+            offsetX: 4,
+            offsetY: 4,
             color: '#000000',
-            blur: 3,
+            blur: 4,
             stroke: true,
             fill: true
           }
@@ -1493,16 +1559,16 @@ export default function QuestGamePage() {
 
         this.tweens.add({
           targets: damageText,
-          y: damageText.y - 60,
+          y: damageText.y - 70,
           alpha: 0,
-          duration: 1500,
+          duration: 1600,
           onComplete: () => damageText.destroy()
         });
 
         if (this.invulnerabilityTimer) {
           this.invulnerabilityTimer.destroy();
         }
-        this.invulnerabilityTimer = this.time.delayedCall(1800, () => {
+        this.invulnerabilityTimer = this.time.delayedCall(1900, () => {
           this.isInvulnerable = false;
           this.invulnerabilityTimer = null;
         });
@@ -1510,23 +1576,23 @@ export default function QuestGamePage() {
         if (this.lives <= 0) {
           console.log('💀 Game Over - No lives remaining after obstacle hit');
           this.gameState = 'GAME_OVER';
-          this.time.delayedCall(1200, () => this.gameOver());
+          this.time.delayedCall(1300, () => this.gameOver());
         }
       }
 
       createHitExplosion(x, y) {
-        const colors = [0xff4444, 0xff8844, 0xffaa44, 0xffffff, 0xff6666];
-        for (let i = 0; i < 12; i++) {
-          const particle = this.add.circle(x, y, window.Phaser.Math.Between(4, 10), colors[i % colors.length]);
-          const angle = (i / 12) * Math.PI * 2;
-          const distance = 50 + Math.random() * 40;
+        const colors = [0xff5555, 0xff9955, 0xffbb55, 0xffffff, 0xff7777];
+        for (let i = 0; i < 15; i++) {
+          const particle = this.add.circle(x, y, window.Phaser.Math.Between(5, 12), colors[i % colors.length]);
+          const angle = (i / 15) * Math.PI * 2;
+          const distance = 60 + Math.random() * 50;
           this.tweens.add({
             targets: particle,
             x: x + Math.cos(angle) * distance,
             y: y + Math.sin(angle) * distance,
             alpha: 0,
             scale: 0.1,
-            duration: 800,
+            duration: 900,
             ease: 'Power2',
             onComplete: () => particle.destroy()
           });
@@ -1535,7 +1601,7 @@ export default function QuestGamePage() {
 
       gameOver() {
         this.gameState = 'GAME_OVER';
-        console.log('💀 Game Over screen showing');
+        console.log('💀 Enhanced Game Over screen showing');
 
         if (this.obstacleTimer) this.obstacleTimer.destroy();
         if (this.coinTimer) this.coinTimer.destroy();
@@ -1545,7 +1611,7 @@ export default function QuestGamePage() {
             targets: obstacle,
             alpha: 0,
             scale: 0,
-            duration: 800,
+            duration: 900,
             onComplete: () => obstacle.destroy()
           });
         });
@@ -1555,62 +1621,62 @@ export default function QuestGamePage() {
             targets: coin,
             alpha: 0,
             scale: 0,
-            duration: 800,
+            duration: 900,
             onComplete: () => coin.destroy()
           });
         });
 
-        const gameOverContainer = this.add.container(600, 300);
+        const gameOverContainer = this.add.container(700, 350);
         gameOverContainer.setDepth(3000);
 
-        const overlay = this.add.rectangle(0, 0, 1200, 600, 0x000000, 0.95);
+        const overlay = this.add.rectangle(0, 0, 1400, 700, 0x000000, 0.96);
 
-        const gameOverGlow = this.add.text(0, -120, 'MISSION FAILED!', {
-          fontSize: '64px',
-          fill: '#ff4444',
+        const gameOverGlow = this.add.text(0, -140, 'MISSION FAILED!', {
+          fontSize: '70px',
+          fill: '#ff5555',
           fontWeight: 'bold',
-          stroke: '#ffcccc',
-          strokeThickness: 12
+          stroke: '#ffdddd',
+          strokeThickness: 14
         }).setOrigin(0.5);
 
-        const gameOverText = this.add.text(0, -120, 'MISSION FAILED!', {
-          fontSize: '56px',
+        const gameOverText = this.add.text(0, -140, 'MISSION FAILED!', {
+          fontSize: '62px',
           fill: '#ffffff',
           fontWeight: 'bold',
           stroke: '#ff0000',
-          strokeThickness: 5
+          strokeThickness: 6
         }).setOrigin(0.5);
 
         const accuracy = this.questionIndex > 0 ? Math.round((this.correctAnswers / this.questionIndex) * 100) : 0;
-        const statsText = this.add.text(0, -40, `🎯 Final Score: ${this.score}\n🚀 Distance: ${Math.floor(this.distance)}m\n📊 Questions: ${this.questionIndex}/${this.questions.length}\n✅ Correct: ${this.correctAnswers} | ❌ Wrong: ${this.wrongAnswers}\n🎪 Accuracy: ${accuracy}%`, {
-          fontSize: '22px',
+        const statsText = this.add.text(0, -50, `🎯 Final Score: ${this.score}\n🚀 Distance: ${Math.floor(this.distance)}m\n📊 Questions: ${this.questionIndex}/${this.questions.length}\n✅ Correct: ${this.correctAnswers} | ❌ Wrong: ${this.wrongAnswers}\n🎪 Accuracy: ${accuracy}%`, {
+          fontSize: '24px',
           fill: '#ffffff',
           align: 'center',
-          lineSpacing: 12,
+          lineSpacing: 14,
           fontWeight: 'bold',
           stroke: '#000000',
           strokeThickness: 2
         }).setOrigin(0.5);
 
-        const restartBtn = this.add.text(0, 100, '🚀 Restart Mission', {
-          fontSize: '28px',
-          fill: '#44ff44',
+        const restartBtn = this.add.text(0, 120, '🚀 Restart Mission', {
+          fontSize: '32px',
+          fill: '#55ff55',
           backgroundColor: '#003300',
-          padding: { x: 35, y: 18 },
+          padding: { x: 40, y: 20 },
           fontWeight: 'bold'
         }).setOrigin(0.5).setInteractive();
 
-        const homeBtn = this.add.text(0, 160, '🏠 Return to Base', {
-          fontSize: '22px',
+        const homeBtn = this.add.text(0, 180, '🏠 Return to Base', {
+          fontSize: '26px',
           fill: '#ffffff',
-          backgroundColor: '#333366',
-          padding: { x: 28, y: 15 },
+          backgroundColor: '#333377',
+          padding: { x: 32, y: 16 },
           fontWeight: 'bold'
         }).setOrigin(0.5).setInteractive();
 
         restartBtn.on('pointerover', () => {
           restartBtn.setScale(1.1);
-          restartBtn.setStyle({ backgroundColor: '#004400' });
+          restartBtn.setStyle({ backgroundColor: '#005500' });
         });
         restartBtn.on('pointerout', () => {
           restartBtn.setScale(1);
@@ -1619,11 +1685,11 @@ export default function QuestGamePage() {
 
         homeBtn.on('pointerover', () => {
           homeBtn.setScale(1.1);
-          homeBtn.setStyle({ backgroundColor: '#444477' });
+          homeBtn.setStyle({ backgroundColor: '#555599' });
         });
         homeBtn.on('pointerout', () => {
           homeBtn.setScale(1);
-          homeBtn.setStyle({ backgroundColor: '#333366' });
+          homeBtn.setStyle({ backgroundColor: '#333377' });
         });
 
         restartBtn.on('pointerdown', () => {
@@ -1644,14 +1710,14 @@ export default function QuestGamePage() {
           targets: gameOverContainer,
           scale: 1,
           alpha: 1,
-          duration: 1000,
+          duration: 1100,
           ease: 'Back.easeOut'
         });
       }
 
       showResults() {
         this.gameState = 'RESULTS';
-        console.log('🏆 Showing results');
+        console.log('🏆 Showing enhanced results');
 
         const totalQuestions = this.questionIndex;
         const percentage = totalQuestions > 0 ? Math.round((this.correctAnswers / totalQuestions) * 100) : 0;
@@ -1667,50 +1733,50 @@ export default function QuestGamePage() {
           passed: percentage >= 70
         };
 
-        console.log('Final results:', results);
+        console.log('Final enhanced results:', results);
 
-        const transitionContainer = this.add.container(600, 300);
+        const transitionContainer = this.add.container(700, 350);
         transitionContainer.setDepth(4000);
 
-        const overlay = this.add.rectangle(0, 0, 1200, 600, 0x000000, 0.9);
+        const overlay = this.add.rectangle(0, 0, 1400, 700, 0x000000, 0.92);
 
-        const completedText = this.add.text(0, -60, '🎉 Mission Complete!', {
-          fontSize: '48px',
-          fill: results.passed ? '#44ff44' : '#ffaa44',
+        const completedText = this.add.text(0, -70, '🎉 Mission Complete!', {
+          fontSize: '54px',
+          fill: results.passed ? '#55ff55' : '#ffbb55',
           fontWeight: 'bold',
           stroke: '#ffffff',
-          strokeThickness: 4,
+          strokeThickness: 5,
           shadow: {
-            offsetX: 3,
-            offsetY: 3,
+            offsetX: 4,
+            offsetY: 4,
             color: '#000000',
-            blur: 4,
+            blur: 5,
             stroke: true,
             fill: true
           }
         }).setOrigin(0.5);
 
-        const distanceText = this.add.text(0, -10, `Distance Traveled: ${results.distance}m`, {
-          fontSize: '28px',
-          fill: '#4488ff',
+        const distanceText = this.add.text(0, -15, `Distance Traveled: ${results.distance}m`, {
+          fontSize: '32px',
+          fill: '#5599ff',
           fontWeight: 'bold',
           stroke: '#000000',
-          strokeThickness: 2
+          strokeThickness: 3
         }).setOrigin(0.5);
 
         const scoreText = this.add.text(0, 20, `Final Score: ${results.score} points`, {
-          fontSize: '24px',
-          fill: '#ffdd44',
+          fontSize: '28px',
+          fill: '#ffdd55',
           fontWeight: 'bold',
           stroke: '#000000',
           strokeThickness: 2
         }).setOrigin(0.5);
 
-        const redirectText = this.add.text(0, 60, 'Preparing results summary...', {
-          fontSize: '20px',
+        const redirectText = this.add.text(0, 70, 'Preparing enhanced results summary...', {
+          fontSize: '22px',
           fill: '#ffffff',
           stroke: '#000000',
-          strokeThickness: 1
+          strokeThickness: 2
         }).setOrigin(0.5);
 
         transitionContainer.add([overlay, completedText, distanceText, scoreText, redirectText]);
@@ -1719,17 +1785,17 @@ export default function QuestGamePage() {
         this.tweens.add({
           targets: transitionContainer,
           alpha: 1,
-          duration: 800,
+          duration: 900,
           ease: 'Power2'
         });
 
         if (results.passed) {
-          this.time.delayedCall(500, () => {
+          this.time.delayedCall(600, () => {
             this.createCelebrationParticles();
           });
         }
 
-        this.time.delayedCall(3000, () => {
+        this.time.delayedCall(3200, () => {
           if (typeof window !== 'undefined') {
             window.localStorage.setItem('gameResults', JSON.stringify(results));
             window.location.href = '/QuestGame/result';
@@ -1738,21 +1804,21 @@ export default function QuestGamePage() {
       }
 
       createCelebrationParticles() {
-        const colors = [0xffff00, 0xff6600, 0xff0066, 0x6600ff, 0x0066ff, 0x00ff66];
-        for (let i = 0; i < 30; i++) {
+        const colors = [0xffff00, 0xff7700, 0xff0077, 0x7700ff, 0x0077ff, 0x00ff77];
+        for (let i = 0; i < 35; i++) {
           const particle = this.add.circle(
-            600 + window.Phaser.Math.Between(-200, 200),
-            300 + window.Phaser.Math.Between(-150, 150),
-            window.Phaser.Math.Between(4, 8),
+            700 + window.Phaser.Math.Between(-250, 250),
+            350 + window.Phaser.Math.Between(-180, 180),
+            window.Phaser.Math.Between(5, 10),
             colors[i % colors.length]
           );
 
           this.tweens.add({
             targets: particle,
-            y: particle.y - window.Phaser.Math.Between(100, 200),
-            x: particle.x + window.Phaser.Math.Between(-50, 50),
+            y: particle.y - window.Phaser.Math.Between(120, 250),
+            x: particle.x + window.Phaser.Math.Between(-60, 60),
             alpha: 0,
-            duration: window.Phaser.Math.Between(1500, 2500),
+            duration: window.Phaser.Math.Between(1600, 2800),
             ease: 'Power2',
             onComplete: () => particle.destroy()
           });
@@ -1769,10 +1835,10 @@ export default function QuestGamePage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="text-white text-2xl font-bold animate-pulse">
-            Loading Perfect Collision Jetpack Game...
+            Loading Enhanced UI Jetpack Game...
           </div>
           <div className="text-purple-300">
-            🎯 GUARANTEED collision detection system loading!
+            🎯 Enhanced graphics and 1.08x faster answer movement!
           </div>
         </div>
       </div>
@@ -1780,107 +1846,109 @@ export default function QuestGamePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-2">
       {/* Header */}
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-          🎯 Perfect Collision Jetpack Quest
+      <div className="flex justify-between items-center mb-3">
+        <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-3">
+          🎯 Enhanced Jetpack Quest
         </h1>
         
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           <button
             onClick={handleReloadClick}
             disabled={!mounted}
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
+            className="px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 text-sm md:text-base"
           >
             🔄 Reload
           </button>
           <button
             onClick={handleRestartClick}
             disabled={!mounted || !gameLoaded}
-            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
+            className="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 text-sm md:text-base"
           >
             🚀 Restart
           </button>
           <button
             onClick={handleHomeClick}
             disabled={!mounted}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
+            className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 text-sm md:text-base"
           >
             🏠 Home
           </button>
         </div>
       </div>
 
-      {/* Game Status Banner */}
+      {/* Enhanced Game Status Banner */}
       {isLoading && (
-        <div className="bg-green-600/20 border border-green-600 rounded-lg p-4 mb-4">
-          <div className="text-green-200 font-medium">
-            🔥 PERFECT COLLISION DETECTION - Physics-based answer zone collision system!
+        <div className="bg-green-600/20 border border-green-600 rounded-lg p-3 mb-3">
+          <div className="text-green-200 font-medium text-sm md:text-base">
+            🔥 ENHANCED UI + 1.08x FASTER ANSWERS - Bigger screen, better graphics, speedier gameplay!
           </div>
-          <div className="text-green-100 text-sm mt-1">
-            ✅ Real physics collision zones | ✅ Perfect visual feedback | ✅ Proper scoring system
+          <div className="text-green-100 text-xs md:text-sm mt-1">
+            ✅ Larger game area (1400x700) | ✅ Enhanced UI elements | ✅ Faster answer movement | ✅ Better visual effects
           </div>
         </div>
       )}
 
       {error && (
-        <div className="bg-red-600/20 border border-red-600 rounded-lg p-4 mb-4">
-          <div className="text-red-200 font-medium">❌ Error: {error}</div>
+        <div className="bg-red-600/20 border border-red-600 rounded-lg p-3 mb-3">
+          <div className="text-red-200 font-medium text-sm">❌ Error: {error}</div>
         </div>
       )}
 
-      {/* Game Container */}
-      <div className="bg-black/40 backdrop-blur rounded-xl p-6 border border-purple-500/30">
+      {/* Enhanced Game Container */}
+      <div className="bg-black/40 backdrop-blur rounded-xl p-3 md:p-4 border border-purple-500/30">
         {/* Loading State */}
         {isLoading && (
-          <div className="text-center py-12">
-            <div className="text-white text-xl mb-4 animate-pulse">
-              Loading Perfect Collision Jetpack Game...
+          <div className="text-center py-8">
+            <div className="text-white text-lg md:text-xl mb-4 animate-pulse">
+              Loading Enhanced UI Jetpack Game...
             </div>
-            <div className="text-purple-300 mb-6">
-              🎯 Initializing GUARANTEED collision detection system...
+            <div className="text-purple-300 mb-4 text-sm md:text-base">
+              🎯 Initializing enhanced graphics and faster gameplay...
             </div>
-            <div className="w-64 mx-auto bg-purple-900/30 rounded-full h-2">
+            <div className="w-48 md:w-64 mx-auto bg-purple-900/30 rounded-full h-2">
               <div className="bg-purple-500 h-2 rounded-full animate-pulse w-3/4"></div>
             </div>
           </div>
         )}
 
-        {/* Game Canvas */}
+        {/* Enhanced Game Canvas */}
         <div 
           ref={gameRef}
-          className={`mx-auto border-2 border-purple-500/50 rounded-lg ${isLoading ? 'hidden' : 'block'}`}
-          style={{ maxWidth: '1200px', maxHeight: '600px' }}
+          className={`mx-auto border-2 border-purple-500/50 rounded-lg overflow-hidden ${isLoading ? 'hidden' : 'block'}`}
+          style={{ maxWidth: '100%', width: '100%', height: 'auto' }}
         />
 
-        {/* Game Instructions */}
+        {/* Enhanced Game Instructions */}
         {gameLoaded && (
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-xs md:text-sm">
             <div className="bg-blue-600/20 border border-blue-600/50 rounded-lg p-3">
-              <div className="text-blue-300 font-medium mb-1">🎮 Controls</div>
+              <div className="text-blue-300 font-medium mb-1">🎮 Enhanced Controls</div>
               <div className="text-blue-100">**Hold SPACE** for boost</div>
+              <div className="text-blue-100">Touch/Click also works</div>
             </div>
             
             <div className="bg-green-600/20 border border-green-600/50 rounded-lg p-3">
-              <div className="text-green-300 font-medium mb-1">⚡ Enhanced Jetpack</div>
-              <div className="text-green-100">Better particles & effects</div>
-              <div className="text-green-100">Visual fuel warnings</div>
-              <div className="text-green-100">Recharges when idle</div>
+              <div className="text-green-300 font-medium mb-1">⚡ Better Jetpack</div>
+              <div className="text-green-100">Enhanced particle effects</div>
+              <div className="text-green-100">Improved fuel bar display</div>
+              <div className="text-green-100">Better visual feedback</div>
             </div>
             
             <div className="bg-yellow-600/20 border border-yellow-600/50 rounded-lg p-3">
               <div className="text-yellow-300 font-medium mb-1">💰 Enhanced Rewards</div>
-              <div className="text-yellow-100">Sparkle effects (+8 pts)</div>
-              <div className="text-yellow-100">Avoid enhanced obstacles</div>
+              <div className="text-yellow-100">Better sparkle effects (+8 pts)</div>
+              <div className="text-yellow-100">Enhanced obstacle designs</div>
+              <div className="text-yellow-100">Improved animations</div>
             </div>
             
             <div className="bg-purple-600/20 border border-purple-600/50 rounded-lg p-3">
-              <div className="text-purple-300 font-medium mb-1">❓ PERFECT Collision Questions</div>
-              <div className="text-purple-100">🔥 Physics-based collision zones</div>
+              <div className="text-purple-300 font-medium mb-1">❓ FASTER Questions</div>
+              <div className="text-purple-100">🔥 1.08x faster movement</div>
               <div className="text-purple-100">🟢 Green = Correct (+25 pts)</div>
               <div className="text-purple-100">🔴 Red = Wrong (-1 life)</div>
-              <div className="text-purple-100">✅ Guaranteed to work!</div>
+              <div className="text-purple-100">✅ Bigger collision zones!</div>
             </div>
           </div>
         )}
