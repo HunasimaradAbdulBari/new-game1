@@ -442,7 +442,6 @@ export default function QuestGamePage() {
         // 🎯 CRITICAL: Create physics groups for collision detection
         this.obstacles = this.physics.add.group();
         this.coins = this.physics.add.group();
-        // Note: answerZones no longer needed - using manual collision detection
 
         // Create UI
         this.createEnhancedJetpackUI();
@@ -895,7 +894,7 @@ export default function QuestGamePage() {
             }).setOrigin(0.5);
 
             this.time.delayedCall(2500, () => {
-              if (checkmark.active) checkmark.destroy();
+              if (checkmark && checkmark.active) checkmark.destroy();
             });
           }
         });
@@ -975,8 +974,6 @@ export default function QuestGamePage() {
             coin.destroy();
           }
         });
-
-        // Note: No answerZones cleanup needed - using manual collision detection
       }
 
       checkQuestionTrigger() {
@@ -1363,26 +1360,40 @@ export default function QuestGamePage() {
       hideEnhancedQuestion() {
         console.log('🔄 Hiding question UI');
 
-        if (this.currentQuestionElements) {
+        if (this.currentQuestionElements && this.currentQuestionElements.length > 0) {
           this.currentQuestionElements.forEach(element => {
-            this.tweens.add({
-              targets: element,
-              y: -150,
-              alpha: 0,
-              duration: 600,
-              onComplete: () => element.destroy()
-            });
+            if (element && element.active) {
+              this.tweens.add({
+                targets: element,
+                y: -150,
+                alpha: 0,
+                duration: 600,
+                onComplete: () => {
+                  if (element && element.active) {
+                    element.destroy();
+                  }
+                }
+              });
+            }
           });
           this.currentQuestionElements = [];
         }
 
-        if (this.currentInstructionText) {
+        // 🔧 FIX: Check if instruction text exists before destroying
+        if (this.currentInstructionText && this.currentInstructionText.active) {
           this.tweens.add({
             targets: this.currentInstructionText,
             alpha: 0,
             duration: 400,
-            onComplete: () => this.currentInstructionText.destroy()
+            onComplete: () => {
+              if (this.currentInstructionText && this.currentInstructionText.active) {
+                this.currentInstructionText.destroy();
+              }
+              this.currentInstructionText = null;
+            }
           });
+        } else {
+          // Reset to null if it doesn't exist
           this.currentInstructionText = null;
         }
 
@@ -1422,13 +1433,15 @@ export default function QuestGamePage() {
       clearAnswerObjects() {
         console.log('🧹 Clearing answer objects');
         
-        // Destroy visual elements only (no physics zones to clear)
-        this.answerObjects.forEach(answerObj => {
-          if (answerObj.bg) answerObj.bg.destroy();
-          if (answerObj.glow) answerObj.glow.destroy();
-          if (answerObj.label) answerObj.label.destroy();
-          if (answerObj.text) answerObj.text.destroy();
-        });
+        // 🔧 FIX: Safely destroy visual elements with existence checks
+        if (this.answerObjects && this.answerObjects.length > 0) {
+          this.answerObjects.forEach(answerObj => {
+            if (answerObj.bg && answerObj.bg.active) answerObj.bg.destroy();
+            if (answerObj.glow && answerObj.glow.active) answerObj.glow.destroy();
+            if (answerObj.label && answerObj.label.active) answerObj.label.destroy();
+            if (answerObj.text && answerObj.text.active) answerObj.text.destroy();
+          });
+        }
         
         this.answerObjects = [];
       }
