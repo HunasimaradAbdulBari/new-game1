@@ -59,8 +59,8 @@ export default function QuestGamePage() {
 
         const config = {
           type: window.Phaser.AUTO,
-          width: 1400, // Increased from 1200
-          height: 700, // Increased from 600
+          width: 1400,
+          height: 700,
           parent: gameRef.current,
           backgroundColor: '#0a0a0f',
           physics: {
@@ -142,7 +142,7 @@ export default function QuestGamePage() {
     });
   };
 
-  // 🔥 ENHANCED UI JETPACK GAME SCENE
+  // 🔥 ENHANCED UI JETPACK GAME SCENE WITH CONTINUOUS MOVEMENT
   const createEnhancedJetpackScene = () => {
     class JetpackGameScene extends window.Phaser.Scene {
       constructor() {
@@ -164,6 +164,9 @@ export default function QuestGamePage() {
         this.jetpackActive = false;
         this.jetpackFuel = 100;
         this.scrollSpeed = 200;
+        // 🔥 NEW: Movement speeds for different states
+        this.normalScrollSpeed = 200;
+        this.questionScrollSpeed = 200 / 1.1; // 1.1x slower during questions
 
         // Game objects
         this.player = null;
@@ -215,6 +218,7 @@ export default function QuestGamePage() {
         this.answerObjects = [];
         this.currentQuestionElements = [];
         this.currentInstructionText = null;
+        this.scrollSpeed = this.normalScrollSpeed;
       }
 
       preload() {
@@ -776,9 +780,16 @@ export default function QuestGamePage() {
 
         this.updateEnhancedFuelBar();
 
+        // 🔥 MODIFIED: Continue movement during questions but slower
         if (this.gameState === 'PLAYING') {
+          this.scrollSpeed = this.normalScrollSpeed;
           this.scrollBackground();
           this.distance += 0.15;
+        } else if (this.gameState === 'QUESTION_ACTIVE') {
+          // 🚀 NEW: Continue movement during questions at 1.1x slower speed
+          this.scrollSpeed = this.questionScrollSpeed;
+          this.scrollBackground();
+          this.distance += 0.15 / 1.1; // Slower distance accumulation
         }
 
         this.cleanupObjects();
@@ -790,7 +801,7 @@ export default function QuestGamePage() {
         this.updateEnhancedJetpackUI();
         this.updateParticles();
 
-        // 🔄 UPDATE MOVING ANSWERS - Move them 1.08x faster
+        // 🔄 UPDATE MOVING ANSWERS - Move them 1.3x faster (MODIFIED from 1.08x)
         if (this.gameState === 'QUESTION_ACTIVE') {
           this.updateMovingAnswers();
         }
@@ -1121,11 +1132,13 @@ export default function QuestGamePage() {
 
         this.gameState = 'QUESTION_ACTIVE';
 
+        // 🔥 MODIFIED: Don't pause timers completely, just slow them down
         this.obstacleTimer.paused = true;
         this.coinTimer.paused = true;
 
+        // 🔥 MODIFIED: Don't stop obstacles completely, just slow them down
         this.obstacles.children.entries.forEach(obstacle => {
-          obstacle.setVelocity(0, 0);
+          obstacle.setVelocityX(-this.questionScrollSpeed); // Continue at slower speed
           this.tweens.add({
             targets: obstacle,
             alpha: 0.25,
@@ -1134,7 +1147,7 @@ export default function QuestGamePage() {
         });
 
         this.coins.children.entries.forEach(coin => {
-          coin.setVelocity(0, 0);
+          coin.setVelocityX(-this.questionScrollSpeed); // Continue at slower speed
           this.tweens.add({
             targets: coin,
             alpha: 0.35,
@@ -1183,9 +1196,9 @@ export default function QuestGamePage() {
         this.currentQuestionElements = [questionBg, questionGlow, this.questionText];
       }
 
-      // 🔥 ENHANCED MOVING COLLISION ANSWER ZONES - 1.08x FASTER SPEED
+      // 🔥 ENHANCED MOVING COLLISION ANSWER ZONES - 1.3x FASTER SPEED (MODIFIED from 1.08x)
       showEnhancedCollisionAnswerZones(question) {
-        console.log('🎯 Creating ENHANCED MOVING collision answer zones with 1.08x speed...');
+        console.log('🎯 Creating ENHANCED MOVING collision answer zones with 1.3x speed...');
         
         this.clearAnswerObjects();
         
@@ -1250,8 +1263,8 @@ export default function QuestGamePage() {
             // Current position for movement
             currentX: startX,
             currentY: yPos,
-            // 🚀 ENHANCED MOVEMENT PROPERTIES - 1.08x FASTER
-            moveSpeed: -32.4, // Original was -30, now -30 * 1.08 = -32.4
+            // 🚀 ENHANCED MOVEMENT PROPERTIES - 1.3x FASTER (MODIFIED from 1.08x)
+            moveSpeed: -39, // Original was -30, now -30 * 1.3 = -39
             isMoving: false
           };
           
@@ -1273,7 +1286,7 @@ export default function QuestGamePage() {
             onComplete: () => {
               // Start moving after fade in
               answerObj.isMoving = true;
-              console.log(`📍 Answer zone ${i} now moving left at ${answerObj.moveSpeed} pixels/second (1.08x faster)`);
+              console.log(`📍 Answer zone ${i} now moving left at ${answerObj.moveSpeed} pixels/second (1.3x faster)`);
             }
           });
           
@@ -1288,7 +1301,7 @@ export default function QuestGamePage() {
         console.log('✅ All enhanced answer zones ready for FASTER collision!');
       }
 
-      // 🔄 UPDATE MOVING ANSWER POSITIONS - Called every frame with 1.08x speed
+      // 🔄 UPDATE MOVING ANSWER POSITIONS - Called every frame with 1.3x speed (MODIFIED from 1.08x)
       updateMovingAnswers() {
         if (this.gameState !== 'QUESTION_ACTIVE' || !this.answerObjects) return;
         
@@ -1299,7 +1312,7 @@ export default function QuestGamePage() {
           
           if (!answerObj.isMoving || answerObj.answered) continue;
           
-          // Update position with 1.08x speed
+          // Update position with 1.3x speed (MODIFIED from 1.08x)
           answerObj.currentX += answerObj.moveSpeed * deltaTime;
           
           // Update all visual elements
@@ -1838,7 +1851,7 @@ export default function QuestGamePage() {
             Loading Enhanced UI Jetpack Game...
           </div>
           <div className="text-purple-300">
-            🎯 Enhanced graphics and 1.08x faster answer movement!
+            🎯 Enhanced graphics and 1.3x faster answer movement!
           </div>
         </div>
       </div>
@@ -1882,10 +1895,10 @@ export default function QuestGamePage() {
       {isLoading && (
         <div className="bg-green-600/20 border border-green-600 rounded-lg p-3 mb-3">
           <div className="text-green-200 font-medium text-sm md:text-base">
-            🔥 ENHANCED UI + 1.08x FASTER ANSWERS - Bigger screen, better graphics, speedier gameplay!
+            🔥 CONTINUOUS MOVEMENT + 1.3x FASTER ANSWERS - Jetpack moves during questions at 1.1x slower speed!
           </div>
           <div className="text-green-100 text-xs md:text-sm mt-1">
-            ✅ Larger game area (1400x700) | ✅ Enhanced UI elements | ✅ Faster answer movement | ✅ Better visual effects
+            ✅ Continuous horizontal movement | ✅ 1.3x faster answers | ✅ Slower movement during questions | ✅ Enhanced collision
           </div>
         </div>
       )}
@@ -1902,10 +1915,10 @@ export default function QuestGamePage() {
         {isLoading && (
           <div className="text-center py-8">
             <div className="text-white text-lg md:text-xl mb-4 animate-pulse">
-              Loading Enhanced UI Jetpack Game...
+              Loading Enhanced Jetpack Game with Continuous Movement...
             </div>
             <div className="text-purple-300 mb-4 text-sm md:text-base">
-              🎯 Initializing enhanced graphics and faster gameplay...
+              🎯 Initializing continuous movement and 1.3x faster answers...
             </div>
             <div className="w-48 md:w-64 mx-auto bg-purple-900/30 rounded-full h-2">
               <div className="bg-purple-500 h-2 rounded-full animate-pulse w-3/4"></div>
@@ -1930,10 +1943,10 @@ export default function QuestGamePage() {
             </div>
             
             <div className="bg-green-600/20 border border-green-600/50 rounded-lg p-3">
-              <div className="text-green-300 font-medium mb-1">⚡ Better Jetpack</div>
-              <div className="text-green-100">Enhanced particle effects</div>
-              <div className="text-green-100">Improved fuel bar display</div>
-              <div className="text-green-100">Better visual feedback</div>
+              <div className="text-green-300 font-medium mb-1">⚡ Continuous Movement</div>
+              <div className="text-green-100">🔥 Jetpack ALWAYS moves forward</div>
+              <div className="text-green-100">🐌 1.1x slower during questions</div>
+              <div className="text-green-100">🚀 Full speed during gameplay</div>
             </div>
             
             <div className="bg-yellow-600/20 border border-yellow-600/50 rounded-lg p-3">
@@ -1945,10 +1958,10 @@ export default function QuestGamePage() {
             
             <div className="bg-purple-600/20 border border-purple-600/50 rounded-lg p-3">
               <div className="text-purple-300 font-medium mb-1">❓ FASTER Questions</div>
-              <div className="text-purple-100">🔥 1.08x faster movement</div>
+              <div className="text-purple-100">🔥 1.3x faster movement</div>
               <div className="text-purple-100">🟢 Green = Correct (+25 pts)</div>
               <div className="text-purple-100">🔴 Red = Wrong (-1 life)</div>
-              <div className="text-purple-100">✅ Bigger collision zones!</div>
+              <div className="text-purple-100">✅ Enhanced collision zones!</div>
             </div>
           </div>
         )}
