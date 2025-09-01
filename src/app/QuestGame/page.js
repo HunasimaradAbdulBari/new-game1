@@ -1,4 +1,4 @@
-// src/app/QuestGame/page.js
+// src/app/QuestGame/page.js - PART 1
 'use client';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { QUESTIONS } from './questions.js';
@@ -530,6 +530,7 @@ export default function QuestGamePage() {
         this.player.setGravityY(0);
         this.player.setTint(0xffffff);
       }
+      // src/app/QuestGame/page.js - PART 2 (CONTINUE FROM PART 1)
 
       createEnhancedJetpackUI() {
         // Enhanced Lives display with better styling
@@ -760,10 +761,11 @@ export default function QuestGamePage() {
       }
 
       update() {
-        // Enhanced jetpack input handling
+        // Enhanced jetpack input handling - INCREASED SPEED TO 1.45x
         if (this.spaceKey.isDown || this.jetpackActive) {
           if (this.jetpackFuel > 0) {
-            this.player.setVelocityY(-350);
+            // CHANGED: Increased from -350 to -507.5 (1.45x speed)
+            this.player.setVelocityY(-507.5);
             this.jetpackFuel = Math.max(0, this.jetpackFuel - 1.2);
             this.createEnhancedJetpackParticles();
             
@@ -771,7 +773,8 @@ export default function QuestGamePage() {
             this.player.setTint(0xbbddff);
           }
         } else {
-          this.player.setVelocityY(this.player.body.velocity.y + 18);
+          // CHANGED: Increased from 18 to 26.1 (1.45x speed)
+          this.player.setVelocityY(this.player.body.velocity.y + 26.1);
           this.jetpackFuel = Math.min(100, this.jetpackFuel + 0.8);
           
           this.player.rotation = Math.min(0.4, this.player.body.velocity.y * 0.002);
@@ -801,7 +804,7 @@ export default function QuestGamePage() {
         this.updateEnhancedJetpackUI();
         this.updateParticles();
 
-        // 🔄 UPDATE MOVING ANSWERS - Move them 1.3x faster (MODIFIED from 1.08x)
+        // 🔄 UPDATE MOVING ANSWERS - Move them 2.3x faster
         if (this.gameState === 'QUESTION_ACTIVE') {
           this.updateMovingAnswers();
         }
@@ -811,10 +814,11 @@ export default function QuestGamePage() {
           this.checkAnswerCollisions();
         }
       }
+      // src/app/QuestGame/page.js - PART 3 (CONTINUE FROM PART 2)
 
-      // 🎯 PERFECT ANSWER SELECTION with proper visual feedback
-      selectAnswer(answerIndex) {
-        console.log(`🚀 Selecting answer ${answerIndex}`);
+      // NEW: Modified selectAnswer to allow pass-through behavior
+      selectAnswerPassThrough(answerIndex) {
+        console.log(`🚀 Selecting answer ${answerIndex} with pass-through`);
         
         const answerObj = this.answerObjects[answerIndex];
         if (!answerObj || answerObj.answered) {
@@ -828,13 +832,8 @@ export default function QuestGamePage() {
         
         console.log(`Selected: "${selectedAnswer}", Correct: "${question.correctAnswer}", Is Correct: ${isCorrect}`);
         
-        // Mark ALL answers as answered to prevent multiple selections
-        this.answerObjects.forEach(obj => {
-          obj.answered = true;
-          if (obj.zone && obj.zone.body) {
-            obj.zone.setVelocityX(0); // Stop all movement
-          }
-        });
+        // Mark this answer as answered but DON'T stop movement - allow pass-through
+        answerObj.answered = true;
         
         if (isCorrect) {
           console.log('✅ CORRECT ANSWER!');
@@ -1196,9 +1195,9 @@ export default function QuestGamePage() {
         this.currentQuestionElements = [questionBg, questionGlow, this.questionText];
       }
 
-      // 🔥 ENHANCED MOVING COLLISION ANSWER ZONES - 1.3x FASTER SPEED (MODIFIED from 1.08x)
+      // 🔥 ENHANCED MOVING COLLISION ANSWER ZONES - 2.3x FASTER SPEED
       showEnhancedCollisionAnswerZones(question) {
-        console.log('🎯 Creating ENHANCED MOVING collision answer zones with 1.3x speed...');
+        console.log('🎯 Creating ENHANCED MOVING collision answer zones with 2.3x speed...');
         
         this.clearAnswerObjects();
         
@@ -1211,11 +1210,11 @@ export default function QuestGamePage() {
           const yPos = 220 + (i * 140); // Increased spacing for bigger screen
           const startX = 1600; // Start from further right for bigger screen
           
-          // Enhanced visual elements with better size
-          const answerBg = this.add.rectangle(startX, yPos, 400, 110, answerColors[i], 0.92);
+          // Enhanced visual elements with better size and INCREASED OPACITY
+          const answerBg = this.add.rectangle(startX, yPos, 400, 110, answerColors[i], 0.98); // CHANGED: Increased opacity from 0.92 to 0.98
           answerBg.setStrokeStyle(5, 0xffffff);
           
-          const answerGlow = this.add.rectangle(startX, yPos, 420, 130, answerColors[i], 0.35);
+          const answerGlow = this.add.rectangle(startX, yPos, 420, 130, answerColors[i], 0.50); // CHANGED: Increased opacity from 0.35 to 0.50
           
           const answerLabel = this.add.text(startX - 160, yPos, answerLabels[i], {
             fontSize: '36px',
@@ -1263,8 +1262,8 @@ export default function QuestGamePage() {
             // Current position for movement
             currentX: startX,
             currentY: yPos,
-            // 🚀 ENHANCED MOVEMENT PROPERTIES - 1.3x FASTER (MODIFIED from 1.08x)
-            moveSpeed: -39, // Original was -30, now -30 * 1.3 = -39
+            // 🚀 ENHANCED MOVEMENT PROPERTIES - 2.3x FASTER
+            moveSpeed: -69, // CHANGED: Original was -30, now -30 * 2.3 = -69
             isMoving: false
           };
           
@@ -1286,7 +1285,7 @@ export default function QuestGamePage() {
             onComplete: () => {
               // Start moving after fade in
               answerObj.isMoving = true;
-              console.log(`📍 Answer zone ${i} now moving left at ${answerObj.moveSpeed} pixels/second (1.3x faster)`);
+              console.log(`📍 Answer zone ${i} now moving left at ${answerObj.moveSpeed} pixels/second (2.3x faster)`);
             }
           });
           
@@ -1298,10 +1297,10 @@ export default function QuestGamePage() {
           this.showQuestionInstruction();
         });
         
-        console.log('✅ All enhanced answer zones ready for FASTER collision!');
+        console.log('✅ All enhanced answer zones ready for 2.3x FASTER collision!');
       }
 
-      // 🔄 UPDATE MOVING ANSWER POSITIONS - Called every frame with 1.3x speed (MODIFIED from 1.08x)
+      // 🔄 UPDATE MOVING ANSWER POSITIONS - Called every frame with 2.3x speed
       updateMovingAnswers() {
         if (this.gameState !== 'QUESTION_ACTIVE' || !this.answerObjects) return;
         
@@ -1312,7 +1311,7 @@ export default function QuestGamePage() {
           
           if (!answerObj.isMoving || answerObj.answered) continue;
           
-          // Update position with 1.3x speed (MODIFIED from 1.08x)
+          // Update position with 2.3x speed
           answerObj.currentX += answerObj.moveSpeed * deltaTime;
           
           // Update all visual elements
@@ -1329,7 +1328,7 @@ export default function QuestGamePage() {
         }
       }
 
-      // 🎯 ENHANCED COLLISION DETECTION for faster moving answers
+      // 🎯 ENHANCED COLLISION DETECTION for faster moving answers with PASS-THROUGH behavior
       checkAnswerCollisions() {
         if (this.gameState !== 'QUESTION_ACTIVE' || !this.player || !this.answerObjects) return;
         
@@ -1358,7 +1357,8 @@ export default function QuestGamePage() {
             console.log(`Player bounds: x=${Math.round(playerBounds.x)}, y=${Math.round(playerBounds.y)}, w=${Math.round(playerBounds.width)}, h=${Math.round(playerBounds.height)}`);
             console.log(`Answer bounds: x=${Math.round(bounds.x)}, y=${Math.round(bounds.y)}, w=${bounds.width}, h=${bounds.height}`);
             
-            this.selectAnswer(i);
+            // CHANGED: Instead of stopping movement, let jetpack pass through
+            this.selectAnswerPassThrough(i);
             return; // Exit after first collision
           }
         }
@@ -1394,6 +1394,7 @@ export default function QuestGamePage() {
 
         this.currentInstructionText = instruction;
       }
+      // src/app/QuestGame/page.js - PART 4 (FINAL PART - CONTINUE FROM PART 3)
 
       createSuccessExplosion(x, y) {
         const colors = [0x00ff55, 0x55ff55, 0x99ff99, 0xbbffbb, 0xffffff];
@@ -1851,7 +1852,7 @@ export default function QuestGamePage() {
             Loading Enhanced UI Jetpack Game...
           </div>
           <div className="text-purple-300">
-            🎯 Enhanced graphics and 1.3x faster answer movement!
+            🎯 Enhanced graphics and 2.3x faster answer movement!
           </div>
         </div>
       </div>
@@ -1895,10 +1896,10 @@ export default function QuestGamePage() {
       {isLoading && (
         <div className="bg-green-600/20 border border-green-600 rounded-lg p-3 mb-3">
           <div className="text-green-200 font-medium text-sm md:text-base">
-            🔥 CONTINUOUS MOVEMENT + 1.3x FASTER ANSWERS - Jetpack moves during questions at 1.1x slower speed!
+            🔥 CONTINUOUS MOVEMENT + 2.3x FASTER ANSWERS + PASS-THROUGH COLLISION - Jetpack moves during questions at 1.1x slower speed!
           </div>
           <div className="text-green-100 text-xs md:text-sm mt-1">
-            ✅ Continuous horizontal movement | ✅ 1.3x faster answers | ✅ Slower movement during questions | ✅ Enhanced collision
+            ✅ Continuous horizontal movement | ✅ 2.3x faster answers | ✅ 1.45x faster jetpack | ✅ Pass-through collision | ✅ Increased opacity
           </div>
         </div>
       )}
@@ -1918,7 +1919,7 @@ export default function QuestGamePage() {
               Loading Enhanced Jetpack Game with Continuous Movement...
             </div>
             <div className="text-purple-300 mb-4 text-sm md:text-base">
-              🎯 Initializing continuous movement and 1.3x faster answers...
+              🎯 Initializing continuous movement and 2.3x faster answers with pass-through collision...
             </div>
             <div className="w-48 md:w-64 mx-auto bg-purple-900/30 rounded-full h-2">
               <div className="bg-purple-500 h-2 rounded-full animate-pulse w-3/4"></div>
@@ -1940,6 +1941,7 @@ export default function QuestGamePage() {
               <div className="text-blue-300 font-medium mb-1">🎮 Enhanced Controls</div>
               <div className="text-blue-100">**Hold SPACE** for boost</div>
               <div className="text-blue-100">Touch/Click also works</div>
+              <div className="text-blue-100">🚀 1.45x faster jetpack!</div>
             </div>
             
             <div className="bg-green-600/20 border border-green-600/50 rounded-lg p-3">
@@ -1957,11 +1959,12 @@ export default function QuestGamePage() {
             </div>
             
             <div className="bg-purple-600/20 border border-purple-600/50 rounded-lg p-3">
-              <div className="text-purple-300 font-medium mb-1">❓ FASTER Questions</div>
-              <div className="text-purple-100">🔥 1.3x faster movement</div>
+              <div className="text-purple-300 font-medium mb-1">❓ SUPER FAST Questions</div>
+              <div className="text-purple-100">🔥 2.3x faster movement!</div>
               <div className="text-purple-100">🟢 Green = Correct (+25 pts)</div>
               <div className="text-purple-100">🔴 Red = Wrong (-1 life)</div>
-              <div className="text-purple-100">✅ Enhanced collision zones!</div>
+              <div className="text-purple-100">✅ Pass-through collision!</div>
+              <div className="text-purple-100">💎 Higher opacity answers!</div>
             </div>
           </div>
         )}
