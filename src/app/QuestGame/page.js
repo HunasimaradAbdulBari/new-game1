@@ -186,6 +186,10 @@ export default function QuestGamePage() {
         this.currentQuestionElements = [];
         this.currentInstructionText = null;
         this.answerProcessed = false;
+        
+        // MODIFIED: Distance-based question triggers with 30m interval
+        this.nextQuestionDistance = 75; // First question at 75m
+        this.questionInterval = 30; // MODIFIED: Next questions every 30m (was 60m)
       }
 
       init(data) {
@@ -209,6 +213,10 @@ export default function QuestGamePage() {
         this.currentInstructionText = null;
         this.scrollSpeed = this.normalScrollSpeed;
         this.answerProcessed = false;
+        
+        // MODIFIED: Reset distance triggers with 30m interval
+        this.nextQuestionDistance = 75; // First question at 75m
+        this.questionInterval = 30; // MODIFIED: Next questions every 30m (was 60m)
       }
 
       preload() {
@@ -449,19 +457,19 @@ export default function QuestGamePage() {
       }
 
       createCleanFuelBar() {
-        // Fuel bar positioned with proper spacing
-        this.fuelBarBg = this.add.rectangle(1200, 80, 160, 20, 0x2D3748);
+        // MODIFIED: Moved fuel bar down to avoid overlap with question
+        this.fuelBarBg = this.add.rectangle(1200, 160, 160, 20, 0x2D3748);
         this.fuelBarBg.setStrokeStyle(2, 0xE2E8F0);
-        this.fuelBar = this.add.rectangle(1200, 80, 150, 16, 0x68D391);
+        this.fuelBar = this.add.rectangle(1200, 160, 150, 16, 0x68D391);
 
-        this.fuelText = this.add.text(1200, 110, 'JETPACK FUEL', {
+        this.fuelText = this.add.text(1200, 190, 'JETPACK FUEL', {
           fontSize: '12px',
           fill: '#E2E8F0',
           fontWeight: 'bold',
           fontFamily: 'Arial, sans-serif'
         }).setOrigin(0.5, 0);
 
-        this.fuelPercentText = this.add.text(1200, 80, '100%', {
+        this.fuelPercentText = this.add.text(1200, 160, '100%', {
           fontSize: '10px',
           fill: '#1A202C',
           fontWeight: 'bold',
@@ -673,9 +681,10 @@ export default function QuestGamePage() {
         });
       }
 
+      // MODIFIED: Changed from obstacle-based to distance-based trigger
       checkQuestionTrigger() {
-        if (this.obstaclesPassed >= 4) {
-          this.obstaclesPassed = 0;
+        if (this.distance >= this.nextQuestionDistance) {
+          console.log(`Distance trigger reached: ${this.distance}m >= ${this.nextQuestionDistance}m`);
           this.showRedesignedQuestion();
         }
       }
@@ -761,7 +770,7 @@ export default function QuestGamePage() {
       }
 
       showCleanQuestionUI(question) {
-        // Clean question positioning - no overlap
+        // MODIFIED: Added more top margin to avoid overlapping
         const questionBg = this.add.rectangle(700, -60, 900, 80, 0x2D3748, 0.95);
         questionBg.setStrokeStyle(2, 0x68D391);
 
@@ -776,7 +785,7 @@ export default function QuestGamePage() {
 
         this.tweens.add({
           targets: [questionBg, this.questionText],
-          y: 40, // Well above the game area
+          y: 50, // MODIFIED: Even higher position with more top margin
           duration: 700,
           ease: 'Back.easeOut'
         });
@@ -785,22 +794,24 @@ export default function QuestGamePage() {
       }
 
       showTransparentAnswerZones(question) {
-        console.log('Creating TRANSPARENT answer zones with FASTER speed...');
+        console.log('Creating properly aligned transparent answer zones...');
         this.clearAnswerObjects();
 
         const answerLabels = ['A', 'B', 'C', 'D'];
         this.answerObjects = [];
 
-        for (let i = 0; i < question.answers.length; i++) {
-          // WELL-SPACED positioning - no overlap
-          const yPos = 180 + (i * 130); // More vertical space
-          const startX = 1500;
+        // MODIFIED: Centered X position for perfect vertical alignment
+        const centerX = 1500;
 
-          // COMPLETELY TRANSPARENT answer boxes
-          const answerBg = this.add.rectangle(startX, yPos, 500, 100, 0x000000, 0);
-          answerBg.setStrokeStyle(1, 0x68D391, 0.3); // Barely visible outline
+        for (let i = 0; i < question.answers.length; i++) {
+          // MODIFIED: Perfectly aligned vertical positioning with consistent spacing
+          const yPos = 200 + (i * 120); // MODIFIED: Consistent 120px spacing for perfect alignment
+
+          // MODIFIED: More transparent background, removed green border
+          const answerBg = this.add.rectangle(centerX, yPos, 500, 100, 0xE8E8E8, 0.4); // MODIFIED: Reduced opacity from 0.85 to 0.4 for more transparency
+          // REMOVED: Green border - no setStrokeStyle call
           
-          const answerLabel = this.add.text(startX - 220, yPos, answerLabels[i], {
+          const answerLabel = this.add.text(centerX - 220, yPos, answerLabels[i], {
             fontSize: '28px',
             fill: '#F6AD55',
             fontWeight: 'bold',
@@ -809,15 +820,13 @@ export default function QuestGamePage() {
             strokeThickness: 3
           }).setOrigin(0.5);
 
-          const answerText = this.add.text(startX, yPos, question.answers[i], {
+          const answerText = this.add.text(centerX, yPos, question.answers[i], {
             fontSize: '18px',
-            fill: '#E2E8F0',
+            fill: '#1A202C',
             align: 'center',
             fontWeight: 'bold',
             wordWrap: { width: 450 },
-            fontFamily: 'Arial, sans-serif',
-            stroke: '#1A202C',
-            strokeThickness: 2
+            fontFamily: 'Arial, sans-serif'
           }).setOrigin(0.5);
 
           const answerObj = {
@@ -827,9 +836,9 @@ export default function QuestGamePage() {
             answered: false,
             answerIndex: i,
             answerText: question.answers[i],
-            currentX: startX,
+            currentX: centerX,
             currentY: yPos,
-            moveSpeed: -117, // MODIFIED: Increased from -78 to -117 (1.5x faster)
+            moveSpeed: -182.8125, // MODIFIED: 1.25x faster (from -146.25 to -182.8125)
             isMoving: false,
             hasPassedPlayer: false
           };
@@ -850,7 +859,7 @@ export default function QuestGamePage() {
             ease: 'Power2.easeOut',
             onComplete: () => {
               answerObj.isMoving = true;
-              console.log('Transparent answer zone', i, 'now moving at', answerObj.moveSpeed, 'pixels/second (1.5x faster)');
+              console.log('Answer zone', i, 'now moving at', answerObj.moveSpeed, 'pixels/second');
             }
           });
         }
@@ -953,13 +962,17 @@ export default function QuestGamePage() {
           
           // Show success feedback
           answerObj.bg.setFillStyle(0x68D391);
-          answerObj.bg.setAlpha(0.7);
+          answerObj.bg.setAlpha(0.8);
           
           this.createSuccessEffect(answerObj.bg.x, answerObj.bg.y);
           
           this.score += 25;
           this.correctAnswers++;
           this.questionIndex++;
+
+          // MODIFIED: Set next question distance after answering (30m interval)
+          this.nextQuestionDistance = this.distance + this.questionInterval;
+          console.log(`Next question will appear at ${this.nextQuestionDistance}m`);
 
           const scorePopup = this.add.text(answerObj.bg.x, answerObj.bg.y - 50, '+25', {
             fontSize: '36px',
@@ -983,13 +996,17 @@ export default function QuestGamePage() {
           console.log('WRONG!');
           
           answerObj.bg.setFillStyle(0xF56565);
-          answerObj.bg.setAlpha(0.7);
+          answerObj.bg.setAlpha(0.8);
 
           this.showCorrectAnswer(question.correctAnswer);
           this.cameras.main.shake(400, 0.02);
 
           this.lives--;
           this.wrongAnswers++;
+
+          // MODIFIED: Set next question distance after wrong answer too (30m interval)
+          this.nextQuestionDistance = this.distance + this.questionInterval;
+          console.log(`Next question will appear at ${this.nextQuestionDistance}m`);
 
           const damageText = this.add.text(this.player.x, this.player.y - 50, '-1 LIFE', {
             fontSize: '28px',
@@ -1019,27 +1036,19 @@ export default function QuestGamePage() {
         this.answerObjects.forEach((answerObj, index) => {
           const question = this.questions[this.questionIndex];
           if (question.answers[index] === correctAnswer) {
+            // MODIFIED: Only highlight with green color, no tick mark
             this.tweens.add({
               targets: answerObj.bg,
-              alpha: 0.8,
+              alpha: 0.9,
               duration: 300,
               yoyo: true,
               repeat: 3,
               onStart: () => {
-                answerObj.bg.setFillStyle(0x68D391);
+                answerObj.bg.setFillStyle(0x68D391); // Green highlight only
               }
             });
 
-            const checkmark = this.add.text(answerObj.bg.x + 220, answerObj.bg.y, '✓', {
-              fontSize: '40px',
-              fill: '#68D391',
-              fontWeight: 'bold',
-              fontFamily: 'Arial, sans-serif'
-            }).setOrigin(0.5);
-
-            this.time.delayedCall(3000, () => {
-              if (checkmark && checkmark.active) checkmark.destroy();
-            });
+            // REMOVED: Tick mark - no checkmark creation
           }
         });
       }
