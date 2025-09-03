@@ -48,14 +48,9 @@ export default function QuestGamePage() {
       try {
         setIsLoading(true);
         setError(null);
-        console.log('Starting REDESIGNED UI Jetpack game...');
-        
         await loadPhaserFromCDN();
-        console.log('Phaser loaded successfully');
-        
-        const RedesignedJetpackScene = createRedesignedJetpackScene();
-        console.log('Redesigned UI scene created');
 
+        const RedesignedJetpackScene = createRedesignedJetpackScene();
         const config = {
           type: window.Phaser.AUTO,
           width: 1400,
@@ -80,7 +75,6 @@ export default function QuestGamePage() {
 
         const game = new window.Phaser.Game(config);
         phaserGameRef.current = game;
-        console.log('Redesigned UI Phaser game created');
 
         setTimeout(() => {
           try {
@@ -90,7 +84,6 @@ export default function QuestGamePage() {
             }
             setGameLoaded(true);
             setIsLoading(false);
-            console.log('Redesigned UI game loaded successfully!');
           } catch (err) {
             console.error('Error initializing scene:', err);
             setError('Failed to initialize game scene. Please try reloading.');
@@ -124,17 +117,11 @@ export default function QuestGamePage() {
         resolve();
         return;
       }
-      
       const script = document.createElement('script');
       script.src = 'https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js';
       script.async = true;
-      script.onload = () => {
-        console.log('Phaser loaded from CDN');
-        resolve();
-      };
-      script.onerror = () => {
-        reject(new Error('Failed to load Phaser from CDN'));
-      };
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('Failed to load Phaser from CDN'));
       document.head.appendChild(script);
     });
   };
@@ -143,7 +130,6 @@ export default function QuestGamePage() {
     class JetpackGameScene extends window.Phaser.Scene {
       constructor() {
         super({ key: 'JetpackGameScene' });
-        
         this.lives = 3;
         this.score = 0;
         this.distance = 0;
@@ -167,15 +153,17 @@ export default function QuestGamePage() {
         this.backgroundVideo = null;
         this.jetpackParticles = [];
         this.coins = null;
-        this.answerZones = null;
 
-        this.livesText = null;
+        this.heartIcons = [];
         this.scoreText = null;
         this.distanceText = null;
         this.progressText = null;
         this.questionText = null;
         this.answerObjects = [];
-        this.jetpackBar = null;
+        this.fuelBar = null;
+        this.fuelBarBg = null;
+        this.fuelText = null;
+        this.fuelPercentText = null;
 
         this.cursors = null;
         this.spaceKey = null;
@@ -186,15 +174,14 @@ export default function QuestGamePage() {
         this.currentQuestionElements = [];
         this.currentInstructionText = null;
         this.answerProcessed = false;
-        
-        // MODIFIED: Distance-based question triggers with 30m interval
-        this.nextQuestionDistance = 75; // First question at 75m
-        this.questionInterval = 30; // MODIFIED: Next questions every 30m (was 60m)
+
+        this.nextQuestionDistance = 75;
+        this.questionInterval = 30;
       }
 
       init(data) {
         this.questions = data?.questions || QUESTIONS;
-        
+
         this.lives = 3;
         this.score = 0;
         this.distance = 0;
@@ -213,62 +200,57 @@ export default function QuestGamePage() {
         this.currentInstructionText = null;
         this.scrollSpeed = this.normalScrollSpeed;
         this.answerProcessed = false;
-        
-        // MODIFIED: Reset distance triggers with 30m interval
-        this.nextQuestionDistance = 75; // First question at 75m
-        this.questionInterval = 30; // MODIFIED: Next questions every 30m (was 60m)
+
+        this.nextQuestionDistance = 75;
+        this.questionInterval = 30;
       }
 
       preload() {
         this.createRedesignedAssets();
-        
         try {
           this.load.video('bgvideo', '/bg.mp4', 'loadeddata', false, false);
-          console.log('Loading custom bg.mp4...');
-        } catch (error) {
-          console.log('Custom bg.mp4 not found, will use fallback');
-        }
+        } catch {}
       }
 
       createRedesignedAssets() {
-        // NEW SLEEK JETPACK DESIGN
+        // Player texture
         const playerGraphics = this.add.graphics();
-        
-        // Main body - sleeker design
         playerGraphics.fillStyle(0x2E86AB, 1);
         playerGraphics.fillRoundedRect(15, 25, 35, 40, 8);
-        
-        // Cockpit window
         playerGraphics.fillStyle(0x74D3AE, 0.9);
         playerGraphics.fillCircle(32, 35, 12);
         playerGraphics.fillStyle(0xA23B72, 0.8);
         playerGraphics.fillCircle(32, 35, 8);
-        
-        // Wings - more spacious
         playerGraphics.fillStyle(0xF18F01, 1);
         playerGraphics.fillRoundedRect(5, 40, 20, 8, 4);
         playerGraphics.fillRoundedRect(40, 40, 20, 8, 4);
-        
-        // Thrusters - redesigned
         playerGraphics.fillStyle(0xC73E1D, 1);
         playerGraphics.fillRoundedRect(20, 65, 8, 15, 4);
         playerGraphics.fillRoundedRect(37, 65, 8, 15, 4);
-        
-        // Exhaust ports
         playerGraphics.fillStyle(0xFF6B35, 1);
         playerGraphics.fillCircle(24, 75, 3);
         playerGraphics.fillCircle(41, 75, 3);
-        
         playerGraphics.generateTexture('redesigned-jetpack-player', 65, 85);
         playerGraphics.destroy();
 
-        this.createRedesignedObstacles();
-        this.createRedesignedCoin();
-        this.createRedesignedBackground();
-      }
+        // Hearts (full / empty) as shapes
+        const fullHeart = this.add.graphics();
+        fullHeart.fillStyle(0xE53E3E, 1);
+        fullHeart.fillCircle(12, 12, 8);
+        fullHeart.fillCircle(24, 12, 8);
+        fullHeart.fillTriangle(18, 24, 6, 12, 30, 12);
+        fullHeart.generateTexture('full-heart', 36, 32);
+        fullHeart.destroy();
 
-      createRedesignedObstacles() {
-        // More spaced out obstacle designs
+        const emptyHeart = this.add.graphics();
+        emptyHeart.lineStyle(2, 0xE53E3E, 1);
+        emptyHeart.strokeCircle(12, 12, 8);
+        emptyHeart.strokeCircle(24, 12, 8);
+        emptyHeart.strokeTriangle(18, 24, 6, 12, 30, 12);
+        emptyHeart.generateTexture('empty-heart', 36, 32);
+        emptyHeart.destroy();
+
+        // Obstacles
         const laserGraphics = this.add.graphics();
         laserGraphics.fillStyle(0xFF4444, 0.9);
         laserGraphics.fillRoundedRect(0, 0, 25, 350, 5);
@@ -297,83 +279,66 @@ export default function QuestGamePage() {
         energyGraphics.fillRoundedRect(5, 5, 30, 90, 15);
         energyGraphics.generateTexture('redesigned-energy-obstacle', 40, 100);
         energyGraphics.destroy();
-      }
 
-      createRedesignedCoin() {
-        // FIXED: Removed invalid fillText call
+        // Coin (shapes only)
         const coinGraphics = this.add.graphics();
         coinGraphics.fillStyle(0xFFD700, 1);
         coinGraphics.fillCircle(20, 20, 18);
         coinGraphics.fillStyle(0xFFF8DC, 0.9);
         coinGraphics.fillCircle(20, 20, 14);
         coinGraphics.fillStyle(0xFFD700, 1);
-        coinGraphics.fillCircle(20, 20, 8); // Inner decoration instead of text
+        coinGraphics.fillCircle(20, 20, 8);
         coinGraphics.generateTexture('redesigned-coin', 40, 40);
         coinGraphics.destroy();
-      }
 
-      createRedesignedBackground() {
+        // Background texture
         const bgGraphics = this.add.graphics();
-        
-        // Clean gradient background
         bgGraphics.fillGradientStyle(0x0B1426, 0x1A2332, 0x2D3748, 0x4A5568, 1);
         bgGraphics.fillRect(0, 0, 1400, 700);
-
-        // Spaced out stars
         for (let i = 0; i < 80; i++) {
           const x = Math.random() * 1400;
           const y = Math.random() * 300;
-          const brightness = Math.random();
-          if (brightness > 0.7) {
-            bgGraphics.fillStyle(0xFFFFFF, brightness);
-            bgGraphics.fillCircle(x, y, brightness > 0.9 ? 3 : 1);
+          const a = Math.random();
+          if (a > 0.7) {
+            bgGraphics.fillStyle(0xFFFFFF, a);
+            bgGraphics.fillCircle(x, y, a > 0.9 ? 3 : 1);
           }
         }
-
-        // Clean city silhouette with better spacing
         const cityColor = 0x1A202C;
         const buildingWidth = 80;
         const buildingSpacing = 20;
         const minHeight = 150;
         const maxHeight = 300;
-
         for (let x = 0; x <= 1400; x += buildingWidth + buildingSpacing) {
-          const buildingH = window.Phaser.Math.Between(minHeight, maxHeight);
-          
+          const h = window.Phaser.Math.Between(minHeight, maxHeight);
           bgGraphics.fillStyle(cityColor, 1);
-          bgGraphics.fillRoundedRect(x, 700 - buildingH, buildingWidth, buildingH, 5);
-          
-          // Well-spaced windows
+          bgGraphics.fillRoundedRect(x, 700 - h, buildingWidth, h, 5);
           const windowSize = 8;
-          const windowSpacingX = 18;
-          const windowSpacingY = 25;
-          const rows = Math.floor(buildingH / (windowSize + windowSpacingY));
-          const cols = Math.floor(buildingWidth / (windowSize + windowSpacingX));
-          
-          for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < cols; col++) {
+          const sx = 18;
+          const sy = 25;
+          const rows = Math.floor(h / (windowSize + sy));
+          const cols = Math.floor(buildingWidth / (windowSize + sx));
+          for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
               if (window.Phaser.Math.Between(0, 100) > 40) {
-                const wx = x + 10 + col * windowSpacingX;
-                const wy = 700 - buildingH + 20 + row * windowSpacingY;
-                
+                const wx = x + 10 + c * sx;
+                const wy = 700 - h + 20 + r * sy;
                 bgGraphics.fillStyle(0xFED7AA, 0.9);
                 bgGraphics.fillRoundedRect(wx, wy, windowSize, windowSize, 2);
               }
             }
           }
         }
-
         bgGraphics.generateTexture('redesigned-cityscape-background', 1400, 700);
         bgGraphics.destroy();
       }
 
       create() {
-        console.log('Creating REDESIGNED UI jetpack game scene...');
         this.physics.world.setBounds(0, 0, 1400, 700);
 
         this.createScrollingBackground();
         this.createRedesignedPlayer();
-        
+
         this.obstacles = this.physics.add.group();
         this.coins = this.physics.add.group();
 
@@ -384,7 +349,6 @@ export default function QuestGamePage() {
         this.physics.add.overlap(this.player, this.coins, this.collectCoin, null, this);
 
         this.startSpawning();
-        console.log('REDESIGNED UI jetpack game scene created successfully!');
       }
 
       createScrollingBackground() {
@@ -393,19 +357,22 @@ export default function QuestGamePage() {
             this.backgroundVideo = this.add.video(0, 0, 'bgvideo');
             this.backgroundVideo.setOrigin(0, 0);
             this.backgroundVideo.setDisplaySize(1400, 700);
-            this.backgroundVideo.play(true);
-            console.log('Using custom bg.mp4 background');
-
+            this.backgroundVideo.play(true).catch(() => {
+              if (this.backgroundVideo) {
+                this.backgroundVideo.destroy();
+                this.backgroundVideo = null;
+              }
+              this.background = this.add.tileSprite(0, 0, 1400, 700, 'redesigned-cityscape-background');
+              this.background.setOrigin(0, 0);
+            });
             this.backgroundOverlay = this.add.tileSprite(0, 0, 1400, 700, 'redesigned-cityscape-background');
             this.backgroundOverlay.setOrigin(0, 0);
             this.backgroundOverlay.setAlpha(0.7);
           } else {
             this.background = this.add.tileSprite(0, 0, 1400, 700, 'redesigned-cityscape-background');
             this.background.setOrigin(0, 0);
-            console.log('Using redesigned cityscape background');
           }
-        } catch (error) {
-          console.warn('Background creation error, using fallback');
+        } catch {
           this.background = this.add.tileSprite(0, 0, 1400, 700, 'redesigned-cityscape-background');
           this.background.setOrigin(0, 0);
         }
@@ -422,14 +389,10 @@ export default function QuestGamePage() {
       }
 
       createRedesignedUI() {
-        // TOP LEFT - Game Stats (well-spaced)
-        this.livesText = this.add.text(30, 30, 'Lives: ' + this.lives, {
-          fontSize: '22px',
-          fill: '#E2E8F0',
-          fontWeight: 'bold',
-          fontFamily: 'Arial, sans-serif'
-        });
+        // Hearts
+        this.createHeartIcons();
 
+        // Score / distance / progress
         this.scoreText = this.add.text(30, 65, 'Score: ' + this.score, {
           fontSize: '22px',
           fill: '#68D391',
@@ -452,29 +415,57 @@ export default function QuestGamePage() {
           fontFamily: 'Arial, sans-serif'
         });
 
-        // TOP RIGHT - Fuel bar only (removed overlapping text)
+        // Fuel bar moved UP to avoid any overlap with answers (answers start near y=200)
         this.createCleanFuelBar();
       }
 
-      createCleanFuelBar() {
-        // MODIFIED: Moved fuel bar down to avoid overlap with question
-        this.fuelBarBg = this.add.rectangle(1200, 160, 160, 20, 0x2D3748);
-        this.fuelBarBg.setStrokeStyle(2, 0xE2E8F0);
-        this.fuelBar = this.add.rectangle(1200, 160, 150, 16, 0x68D391);
+      createHeartIcons() {
+        this.heartIcons = [];
+        for (let i = 0; i < 3; i++) {
+          const heart = this.add.image(30 + (i * 45), 35, 'full-heart');
+          heart.setScale(0.8);
+          this.heartIcons.push(heart);
+        }
+      }
 
-        this.fuelText = this.add.text(1200, 190, 'JETPACK FUEL', {
+      updateHeartIcons() {
+        for (let i = 0; i < 3; i++) {
+          if (i < this.lives) {
+            this.heartIcons[i].setTexture('full-heart');
+          } else {
+            this.heartIcons[i].setTexture('empty-heart');
+          }
+        }
+      }
+
+      // Fuel bar group + visibility helpers
+      createCleanFuelBar() {
+        // moved up from 160 -> 110 to keep well away from answer stack
+        this.fuelBarBg = this.add.rectangle(1200, 110, 160, 20, 0x2D3748);
+        this.fuelBarBg.setStrokeStyle(2, 0xE2E8F0);
+        this.fuelBar = this.add.rectangle(1200, 110, 150, 16, 0x68D391);
+
+        this.fuelText = this.add.text(1200, 135, 'JETPACK FUEL', {
           fontSize: '12px',
           fill: '#E2E8F0',
           fontWeight: 'bold',
           fontFamily: 'Arial, sans-serif'
         }).setOrigin(0.5, 0);
 
-        this.fuelPercentText = this.add.text(1200, 160, '100%', {
+        this.fuelPercentText = this.add.text(1200, 110, '100%', {
           fontSize: '10px',
           fill: '#1A202C',
           fontWeight: 'bold',
           fontFamily: 'Arial, sans-serif'
         }).setOrigin(0.5);
+      }
+
+      setFuelBarVisible(visible) {
+        if (!this.fuelBarBg || !this.fuelBar || !this.fuelText || !this.fuelPercentText) return;
+        this.fuelBarBg.setVisible(visible);
+        this.fuelBar.setVisible(visible);
+        this.fuelText.setVisible(visible);
+        this.fuelPercentText.setVisible(visible);
       }
 
       setupInput() {
@@ -483,23 +474,19 @@ export default function QuestGamePage() {
 
         this.input.on('pointerdown', (pointer) => {
           this.jetpackActive = true;
-          this.createTouchFeedback(pointer.x, pointer.y);
+          const ripple = this.add.circle(pointer.x, pointer.y, 8, 0x68D391, 0.7);
+          this.tweens.add({
+            targets: ripple,
+            radius: 40,
+            alpha: 0,
+            duration: 400,
+            ease: 'Power2',
+            onComplete: () => ripple.destroy()
+          });
         });
 
-        this.input.on('pointerup', (pointer) => {
+        this.input.on('pointerup', () => {
           this.jetpackActive = false;
-        });
-      }
-
-      createTouchFeedback(x, y) {
-        const ripple = this.add.circle(x, y, 8, 0x68D391, 0.7);
-        this.tweens.add({
-          targets: ripple,
-          radius: 40,
-          alpha: 0,
-          duration: 400,
-          ease: 'Power2',
-          onComplete: () => ripple.destroy()
         });
       }
 
@@ -604,9 +591,6 @@ export default function QuestGamePage() {
 
         if (this.gameState === 'QUESTION_ACTIVE') {
           this.updateMovingAnswers();
-        }
-
-        if (this.gameState === 'QUESTION_ACTIVE') {
           this.checkAnswerCollisions();
         }
       }
@@ -632,9 +616,7 @@ export default function QuestGamePage() {
             duration: 500,
             ease: 'Power2',
             onComplete: () => {
-              if (particle.active) {
-                particle.destroy();
-              }
+              if (particle.active) particle.destroy();
               this.jetpackParticles = this.jetpackParticles.filter(p => p !== particle);
             }
           });
@@ -681,10 +663,8 @@ export default function QuestGamePage() {
         });
       }
 
-      // MODIFIED: Changed from obstacle-based to distance-based trigger
       checkQuestionTrigger() {
         if (this.distance >= this.nextQuestionDistance) {
-          console.log(`Distance trigger reached: ${this.distance}m >= ${this.nextQuestionDistance}m`);
           this.showRedesignedQuestion();
         }
       }
@@ -716,7 +696,7 @@ export default function QuestGamePage() {
       }
 
       updateUI() {
-        this.livesText.setText('Lives: ' + this.lives);
+        this.updateHeartIcons();
         this.scoreText.setText('Score: ' + this.score);
         this.distanceText.setText('Distance: ' + Math.floor(this.distance) + 'm');
 
@@ -738,7 +718,9 @@ export default function QuestGamePage() {
           return;
         }
 
-        console.log('Showing redesigned question', this.questionIndex + 1 + ':', question.question);
+        // Hide fuel bar during question display to guarantee no overlap
+        this.setFuelBarVisible(false);
+
         this.gameState = 'QUESTION_ACTIVE';
         this.answerProcessed = false;
 
@@ -747,20 +729,12 @@ export default function QuestGamePage() {
 
         this.obstacles.children.entries.forEach(obstacle => {
           obstacle.setVelocityX(-this.questionScrollSpeed);
-          this.tweens.add({
-            targets: obstacle,
-            alpha: 0.3,
-            duration: 600
-          });
+          this.tweens.add({ targets: obstacle, alpha: 0.3, duration: 600 });
         });
 
         this.coins.children.entries.forEach(coin => {
           coin.setVelocityX(-this.questionScrollSpeed);
-          this.tweens.add({
-            targets: coin,
-            alpha: 0.4,
-            duration: 600
-          });
+          this.tweens.add({ targets: coin, alpha: 0.4, duration: 600 });
         });
 
         this.showCleanQuestionUI(question);
@@ -770,7 +744,6 @@ export default function QuestGamePage() {
       }
 
       showCleanQuestionUI(question) {
-        // MODIFIED: Added more top margin to avoid overlapping
         const questionBg = this.add.rectangle(700, -60, 900, 80, 0x2D3748, 0.95);
         questionBg.setStrokeStyle(2, 0x68D391);
 
@@ -785,7 +758,7 @@ export default function QuestGamePage() {
 
         this.tweens.add({
           targets: [questionBg, this.questionText],
-          y: 50, // MODIFIED: Even higher position with more top margin
+          y: 50,
           duration: 700,
           ease: 'Back.easeOut'
         });
@@ -794,23 +767,20 @@ export default function QuestGamePage() {
       }
 
       showTransparentAnswerZones(question) {
-        console.log('Creating properly aligned transparent answer zones...');
         this.clearAnswerObjects();
 
         const answerLabels = ['A', 'B', 'C', 'D'];
         this.answerObjects = [];
 
-        // MODIFIED: Centered X position for perfect vertical alignment
-        const centerX = 1500;
+        // Fixed vertical column alignment
+        const centerX = 1500;     // same X for all answers
+        const startY = 200;       // start Y
+        const gapY = 120;         // spacing
 
         for (let i = 0; i < question.answers.length; i++) {
-          // MODIFIED: Perfectly aligned vertical positioning with consistent spacing
-          const yPos = 200 + (i * 120); // MODIFIED: Consistent 120px spacing for perfect alignment
+          const yPos = startY + (i * gapY);
 
-          // MODIFIED: More transparent background, removed green border
-          const answerBg = this.add.rectangle(centerX, yPos, 500, 100, 0xE8E8E8, 0.4); // MODIFIED: Reduced opacity from 0.85 to 0.4 for more transparency
-          // REMOVED: Green border - no setStrokeStyle call
-          
+          const answerBg = this.add.rectangle(centerX, yPos, 500, 100, 0xE8E8E8, 0.4);
           const answerLabel = this.add.text(centerX - 220, yPos, answerLabels[i], {
             fontSize: '28px',
             fill: '#F6AD55',
@@ -838,29 +808,24 @@ export default function QuestGamePage() {
             answerText: question.answers[i],
             currentX: centerX,
             currentY: yPos,
-            moveSpeed: -182.8125, // MODIFIED: 1.25x faster (from -146.25 to -182.8125)
-            isMoving: false,
+            moveSpeed: -182.8125,
+            isMoving: true,          // IMPORTANT: all answers start moving immediately to keep column aligned
             hasPassedPlayer: false
           };
 
           this.answerObjects.push(answerObj);
 
-          // Start invisible
+          // Fade-in may be staggered, but movement already started for all to preserve alignment
           answerBg.setAlpha(0);
           answerLabel.setAlpha(0);
           answerText.setAlpha(0);
 
-          // Fade in with stagger
           this.tweens.add({
             targets: [answerBg, answerLabel, answerText],
             alpha: 1,
             duration: 500,
             delay: i * 150,
-            ease: 'Power2.easeOut',
-            onComplete: () => {
-              answerObj.isMoving = true;
-              console.log('Answer zone', i, 'now moving at', answerObj.moveSpeed, 'pixels/second');
-            }
+            ease: 'Power2.easeOut'
           });
         }
 
@@ -872,48 +837,40 @@ export default function QuestGamePage() {
       updateMovingAnswers() {
         if (this.gameState !== 'QUESTION_ACTIVE' || !this.answerObjects) return;
 
-        const deltaTime = this.game.loop.delta / 1000;
+        const dt = this.game.loop.delta / 1000;
 
         for (let i = 0; i < this.answerObjects.length; i++) {
-          const answerObj = this.answerObjects[i];
-          if (!answerObj.isMoving) continue;
+          const a = this.answerObjects[i];
+          if (!a.isMoving) continue;
 
-          answerObj.currentX += answerObj.moveSpeed * deltaTime;
+          a.currentX += a.moveSpeed * dt;
 
-          answerObj.bg.x = answerObj.currentX;
-          answerObj.label.x = answerObj.currentX - 220;
-          answerObj.text.x = answerObj.currentX;
+          a.bg.x = a.currentX;
+          a.label.x = a.currentX - 220;
+          a.text.x = a.currentX;
 
-          if (answerObj.currentX < -300) {
-            answerObj.isMoving = false;
-          }
+          if (a.currentX < -300) a.isMoving = false;
         }
       }
 
       checkAnswerCollisions() {
         if (this.gameState !== 'QUESTION_ACTIVE' || !this.player || !this.answerObjects || this.answerProcessed) return;
 
-        const playerBounds = this.player.getBounds();
+        const p = this.player.getBounds();
 
         for (let i = 0; i < this.answerObjects.length; i++) {
-          const answerObj = this.answerObjects[i];
-          if (!answerObj.isMoving) continue;
+          const a = this.answerObjects[i];
+          if (!a.isMoving) continue;
 
-          const bounds = {
-            x: answerObj.currentX - 250,
-            y: answerObj.currentY - 50,
-            width: 500,
-            height: 100
-          };
+          const bounds = { x: a.currentX - 250, y: a.currentY - 50, width: 500, height: 100 };
 
-          const isColliding = playerBounds.x < bounds.x + bounds.width &&
-                             playerBounds.x + playerBounds.width > bounds.x &&
-                             playerBounds.y < bounds.y + bounds.height &&
-                             playerBounds.y + playerBounds.height > bounds.y;
+          const hit = p.x < bounds.x + bounds.width &&
+                      p.x + p.width > bounds.x &&
+                      p.y < bounds.y + bounds.height &&
+                      p.y + p.height > bounds.y;
 
-          if (isColliding && !answerObj.hasPassedPlayer) {
-            answerObj.hasPassedPlayer = true;
-            console.log('Player selected answer', i + ':', answerObj.answerText);
+          if (hit && !a.hasPassedPlayer) {
+            a.hasPassedPlayer = true;
             this.selectAnswer(i);
             return;
           }
@@ -945,36 +902,29 @@ export default function QuestGamePage() {
       }
 
       selectAnswer(answerIndex) {
-        console.log('Selecting answer', answerIndex);
         if (this.answerProcessed) return;
-        
-        const answerObj = this.answerObjects[answerIndex];
-        if (!answerObj) return;
+
+        const a = this.answerObjects[answerIndex];
+        if (!a) return;
 
         this.answerProcessed = true;
 
-        const question = this.questions[this.questionIndex];
-        const selectedAnswer = question.answers[answerIndex];
-        const isCorrect = selectedAnswer === question.correctAnswer;
+        const q = this.questions[this.questionIndex];
+        const selectedAnswer = q.answers[answerIndex];
+        const isCorrect = selectedAnswer === q.correctAnswer;
 
         if (isCorrect) {
-          console.log('CORRECT!');
-          
-          // Show success feedback
-          answerObj.bg.setFillStyle(0x68D391);
-          answerObj.bg.setAlpha(0.8);
-          
-          this.createSuccessEffect(answerObj.bg.x, answerObj.bg.y);
-          
+          a.bg.setFillStyle(0x68D391).setAlpha(0.8);
+
+          this.createSuccessEffect(a.bg.x, a.bg.y);
+
           this.score += 25;
           this.correctAnswers++;
           this.questionIndex++;
 
-          // MODIFIED: Set next question distance after answering (30m interval)
           this.nextQuestionDistance = this.distance + this.questionInterval;
-          console.log(`Next question will appear at ${this.nextQuestionDistance}m`);
 
-          const scorePopup = this.add.text(answerObj.bg.x, answerObj.bg.y - 50, '+25', {
+          const scorePopup = this.add.text(a.bg.x, a.bg.y - 50, '+25', {
             fontSize: '36px',
             fill: '#68D391',
             fontWeight: 'bold',
@@ -993,20 +943,15 @@ export default function QuestGamePage() {
 
           this.time.delayedCall(2500, () => this.hideQuestion());
         } else {
-          console.log('WRONG!');
-          
-          answerObj.bg.setFillStyle(0xF56565);
-          answerObj.bg.setAlpha(0.8);
+          a.bg.setFillStyle(0xF56565).setAlpha(0.8);
 
-          this.showCorrectAnswer(question.correctAnswer);
+          this.showCorrectAnswer(q.correctAnswer);
           this.cameras.main.shake(400, 0.02);
 
           this.lives--;
           this.wrongAnswers++;
 
-          // MODIFIED: Set next question distance after wrong answer too (30m interval)
           this.nextQuestionDistance = this.distance + this.questionInterval;
-          console.log(`Next question will appear at ${this.nextQuestionDistance}m`);
 
           const damageText = this.add.text(this.player.x, this.player.y - 50, '-1 LIFE', {
             fontSize: '28px',
@@ -1033,22 +978,19 @@ export default function QuestGamePage() {
       }
 
       showCorrectAnswer(correctAnswer) {
-        this.answerObjects.forEach((answerObj, index) => {
-          const question = this.questions[this.questionIndex];
-          if (question.answers[index] === correctAnswer) {
-            // MODIFIED: Only highlight with green color, no tick mark
+        this.answerObjects.forEach((a, idx) => {
+          const q = this.questions[this.questionIndex];
+          if (q.answers[idx] === correctAnswer) {
             this.tweens.add({
-              targets: answerObj.bg,
+              targets: a.bg,
               alpha: 0.9,
               duration: 300,
               yoyo: true,
               repeat: 3,
               onStart: () => {
-                answerObj.bg.setFillStyle(0x68D391); // Green highlight only
+                a.bg.setFillStyle(0x68D391);
               }
             });
-
-            // REMOVED: Tick mark - no checkmark creation
           }
         });
       }
@@ -1056,37 +998,33 @@ export default function QuestGamePage() {
       createSuccessEffect(x, y) {
         const colors = [0x68D391, 0x90CDF4, 0xF6AD55, 0xFED7AA];
         for (let i = 0; i < 12; i++) {
-          const particle = this.add.circle(x, y, window.Phaser.Math.Between(4, 8), colors[i % colors.length]);
+          const p = this.add.circle(x, y, window.Phaser.Math.Between(4, 8), colors[i % colors.length]);
           const angle = (i / 12) * Math.PI * 2;
-          const distance = 80 + Math.random() * 40;
+          const dist = 80 + Math.random() * 40;
           this.tweens.add({
-            targets: particle,
-            x: x + Math.cos(angle) * distance,
-            y: y + Math.sin(angle) * distance,
+            targets: p,
+            x: x + Math.cos(angle) * dist,
+            y: y + Math.sin(angle) * dist,
             alpha: 0,
             scale: 0.3,
             duration: 1100,
             ease: 'Power2',
-            onComplete: () => particle.destroy()
+            onComplete: () => p.destroy()
           });
         }
       }
 
       hideQuestion() {
-        console.log('Hiding question UI');
-        
         if (this.currentQuestionElements && this.currentQuestionElements.length > 0) {
-          this.currentQuestionElements.forEach(element => {
-            if (element && element.active) {
+          this.currentQuestionElements.forEach(el => {
+            if (el && el.active) {
               this.tweens.add({
-                targets: element,
+                targets: el,
                 y: -150,
                 alpha: 0,
                 duration: 600,
                 onComplete: () => {
-                  if (element && element.active) {
-                    element.destroy();
-                  }
+                  if (el && el.active) el.destroy();
                 }
               });
             }
@@ -1120,32 +1058,27 @@ export default function QuestGamePage() {
           this.obstacleTimer.paused = false;
           this.coinTimer.paused = false;
 
+          // Restore fuel bar after question
+          this.setFuelBarVisible(true);
+
           this.obstacles.children.entries.forEach(obstacle => {
             obstacle.setVelocityX(-this.scrollSpeed);
-            this.tweens.add({
-              targets: obstacle,
-              alpha: 1,
-              duration: 500
-            });
+            this.tweens.add({ targets: obstacle, alpha: 1, duration: 500 });
           });
 
           this.coins.children.entries.forEach(coin => {
             coin.setVelocityX(-this.scrollSpeed);
-            this.tweens.add({
-              targets: coin,
-              alpha: 1,
-              duration: 500
-            });
+            this.tweens.add({ targets: coin, alpha: 1, duration: 500 });
           });
         });
       }
 
       clearAnswerObjects() {
         if (this.answerObjects && this.answerObjects.length > 0) {
-          this.answerObjects.forEach(answerObj => {
-            if (answerObj.bg && answerObj.bg.active) answerObj.bg.destroy();
-            if (answerObj.label && answerObj.label.active) answerObj.label.destroy();
-            if (answerObj.text && answerObj.text.active) answerObj.text.destroy();
+          this.answerObjects.forEach(a => {
+            if (a.bg && a.bg.active) a.bg.destroy();
+            if (a.label && a.label.active) a.label.destroy();
+            if (a.text && a.text.active) a.text.destroy();
           });
         }
         this.answerObjects = [];
@@ -1211,12 +1144,11 @@ export default function QuestGamePage() {
         if (this.obstacleTimer) this.obstacleTimer.destroy();
         if (this.coinTimer) this.coinTimer.destroy();
 
-        const gameOverContainer = this.add.container(700, 350);
-        gameOverContainer.setDepth(3000);
+        const container = this.add.container(700, 350);
+        container.setDepth(3000);
 
         const overlay = this.add.rectangle(0, 0, 1400, 700, 0x1A202C, 0.95);
-        
-        const gameOverText = this.add.text(0, -100, 'MISSION FAILED', {
+        const title = this.add.text(0, -100, 'MISSION FAILED', {
           fontSize: '54px',
           fill: '#F56565',
           fontWeight: 'bold',
@@ -1224,7 +1156,7 @@ export default function QuestGamePage() {
         }).setOrigin(0.5);
 
         const accuracy = this.questionIndex > 0 ? Math.round((this.correctAnswers / this.questionIndex) * 100) : 0;
-        const statsText = this.add.text(0, -20, 
+        const stats = this.add.text(0, -20,
           `Final Score: ${this.score}\n` +
           `Distance: ${Math.floor(this.distance)}m\n` +
           `Questions: ${this.questionIndex}/${this.questions.length}\n` +
@@ -1260,17 +1192,14 @@ export default function QuestGamePage() {
           restartBtn.setScale(1.05);
           restartBtn.setStyle({ backgroundColor: '#4FD1C7' });
         });
-
         restartBtn.on('pointerout', () => {
           restartBtn.setScale(1);
           restartBtn.setStyle({ backgroundColor: '#68D391' });
         });
-
         homeBtn.on('pointerover', () => {
           homeBtn.setScale(1.05);
           homeBtn.setStyle({ backgroundColor: '#4A5568' });
         });
-
         homeBtn.on('pointerout', () => {
           homeBtn.setScale(1);
           homeBtn.setStyle({ backgroundColor: '#2D3748' });
@@ -1279,22 +1208,13 @@ export default function QuestGamePage() {
         restartBtn.on('pointerdown', () => {
           this.scene.restart({ questions: this.questions });
         });
-
         homeBtn.on('pointerdown', () => {
-          if (typeof window !== 'undefined') {
-            window.location.href = '/';
-          }
+          if (typeof window !== 'undefined') window.location.href = '/';
         });
 
-        gameOverContainer.add([overlay, gameOverText, statsText, restartBtn, homeBtn]);
-        gameOverContainer.setAlpha(0);
-
-        this.tweens.add({
-          targets: gameOverContainer,
-          alpha: 1,
-          duration: 800,
-          ease: 'Power2'
-        });
+        container.add([overlay, title, stats, restartBtn, homeBtn]);
+        container.setAlpha(0);
+        this.tweens.add({ targets: container, alpha: 1, duration: 800, ease: 'Power2' });
       }
 
       showResults() {
@@ -1314,12 +1234,11 @@ export default function QuestGamePage() {
           passed: percentage >= 70
         };
 
-        const transitionContainer = this.add.container(700, 350);
-        transitionContainer.setDepth(4000);
+        const container = this.add.container(700, 350);
+        container.setDepth(4000);
 
         const overlay = this.add.rectangle(0, 0, 1400, 700, 0x1A202C, 0.95);
-        
-        const completedText = this.add.text(0, -50, 'Mission Complete!', {
+        const completed = this.add.text(0, -50, 'Mission Complete!', {
           fontSize: '48px',
           fill: results.passed ? '#68D391' : '#F6AD55',
           fontWeight: 'bold',
@@ -1339,15 +1258,9 @@ export default function QuestGamePage() {
           fontFamily: 'Arial, sans-serif'
         }).setOrigin(0.5);
 
-        transitionContainer.add([overlay, completedText, scoreText, redirectText]);
-        transitionContainer.setAlpha(0);
-
-        this.tweens.add({
-          targets: transitionContainer,
-          alpha: 1,
-          duration: 700,
-          ease: 'Power2'
-        });
+        container.add([overlay, completed, scoreText, redirectText]);
+        container.setAlpha(0);
+        this.tweens.add({ targets: container, alpha: 1, duration: 700, ease: 'Power2' });
 
         this.time.delayedCall(2500, () => {
           if (typeof window !== 'undefined') {
@@ -1363,11 +1276,11 @@ export default function QuestGamePage() {
 
   if (!mounted) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh', 
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
         background: 'linear-gradient(45deg, #0B1426, #1A2332)',
         color: 'white',
         fontFamily: 'Arial, sans-serif'
@@ -1382,11 +1295,11 @@ export default function QuestGamePage() {
 
   if (error) {
     return (
-      <div style={{ 
-        display: 'flex', 
+      <div style={{
+        display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'center', 
-        alignItems: 'center', 
+        justifyContent: 'center',
+        alignItems: 'center',
         height: '100vh',
         background: 'linear-gradient(45deg, #1A202C, #2D3748)',
         color: 'white',
@@ -1397,7 +1310,7 @@ export default function QuestGamePage() {
         <div style={{ fontSize: '32px', marginBottom: '20px' }}>Game Error</div>
         <div style={{ fontSize: '18px', marginBottom: '30px', maxWidth: '600px' }}>{error}</div>
         <div style={{ display: 'flex', gap: '15px' }}>
-          <button 
+          <button
             onClick={handleReloadClick}
             style={{
               padding: '12px 24px',
@@ -1412,7 +1325,7 @@ export default function QuestGamePage() {
           >
             Reload Game
           </button>
-          <button 
+          <button
             onClick={handleHomeClick}
             style={{
               padding: '12px 24px',
@@ -1433,9 +1346,9 @@ export default function QuestGamePage() {
   }
 
   return (
-    <div style={{ 
-      width: '100%', 
-      height: '100vh', 
+    <div style={{
+      width: '100%',
+      height: '100vh',
       overflow: 'hidden',
       background: 'linear-gradient(45deg, #0B1426, #1A2332)',
       display: 'flex',
@@ -1444,7 +1357,7 @@ export default function QuestGamePage() {
       justifyContent: 'center'
     }}>
       {isLoading && (
-        <div style={{ 
+        <div style={{
           position: 'absolute',
           top: 0,
           left: 0,
@@ -1465,18 +1378,18 @@ export default function QuestGamePage() {
           </div>
         </div>
       )}
-      
-      <div 
-        ref={gameRef} 
-        style={{ 
-          width: '100%', 
+
+      <div
+        ref={gameRef}
+        style={{
+          width: '100%',
           height: '100%',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center'
-        }} 
+        }}
       />
-      
+
       {gameLoaded && (
         <div style={{
           position: 'absolute',
@@ -1486,7 +1399,7 @@ export default function QuestGamePage() {
           gap: '10px',
           zIndex: 100
         }}>
-          <button 
+          <button
             onClick={handleRestartClick}
             style={{
               padding: '8px 16px',
@@ -1507,7 +1420,7 @@ export default function QuestGamePage() {
             </svg>
             Restart
           </button>
-          <button 
+          <button
             onClick={handleHomeClick}
             style={{
               padding: '8px 16px',
